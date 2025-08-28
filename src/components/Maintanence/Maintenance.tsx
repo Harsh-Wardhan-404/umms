@@ -18,7 +18,7 @@ const Maintenance = () => {
                         <h1 className="text-3xl font-bold">Maintenance Break</h1>
                         <div className="flex flex-col justify-center items-center gap-1">
                             <h2 className="text-lg font-semibold">We are currently performing scheduled maintenance.</h2>
-                            <h2 className="text-md font-medium">Estimated Time: {MAINTENANCE_MODE.estimatedTime}</h2>
+                            <h2 className="text-md font-medium">{MAINTENANCE_MODE.message}</h2>
                         </div>
                     </div>
 
