@@ -1,4 +1,4 @@
-import SignUp from "./_components/SignUp"
+import SignUp from "./_components/SignIn"
 import ThemeToggle from "../ThemeToggle"
 
 const Auth = () => {

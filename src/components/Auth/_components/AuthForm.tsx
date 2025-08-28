@@ -19,7 +19,7 @@ const AuthForm = () => {
         <div className="flex justify-center items-center p-12 h-screen bg-slate-200 dark:bg-[#282C35]">
             <BackgroundGradient containerClassName="w-[95%] md:w-[60%] lg:w-[50%] xl:w-[30%] rounded" className="p-5 w-full rounded-3xl bg-white dark:bg-[#1A1C22]">
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                    <h1 className="text-2xl font-bold text-center">Sign Up</h1>
+                    <h1 className="text-2xl font-bold text-center">Sign In</h1>
                     <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold">Email Address</p>
                         <input type="email" name="email" value={userData.email} onChange={handleChange} placeholder="Email" className="p-2 border border-gray-300 rounded placeholder:font-semibold" />
