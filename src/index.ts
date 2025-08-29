@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "./generated/prisma";
 import stockRoutes from "./routes/stockRoutes";
+import authRoutes from "./routes/authRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,8 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/auth", authRoutes);
 
 // Static file serving for uploaded bills
 app.use("/uploads", express.static("uploads"));
