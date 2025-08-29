@@ -16,13 +16,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/auth", authRoutes);
-
 // Static file serving for uploaded bills
 app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.use("/api/stock", stockRoutes);
+app.use("/api/auth", authRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -46,6 +45,7 @@ app.listen(PORT, () => {
   console.log(`🚀 UMMS Backend server is running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📦 Stock API: http://localhost:${PORT}/api/stock`);
+  console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
 });
 
 // Graceful shutdown
