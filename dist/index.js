@@ -19,6 +19,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_1 = require("./generated/prisma");
 const stockRoutes_1 = __importDefault(require("./routes/stockRoutes"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const formulationRoutes_1 = __importDefault(require("./routes/formulationRoutes"));
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -33,6 +34,7 @@ app.use("/uploads", express_1.default.static("uploads"));
 // Routes
 app.use("/api/stock", stockRoutes_1.default);
 app.use("/api/auth", authRoutes_1.default);
+app.use("/api/formulations", formulationRoutes_1.default);
 // Health check
 app.get("/health", (req, res) => {
     res.json({ status: "OK", message: "UMMS Backend is running" });
@@ -52,6 +54,7 @@ app.listen(PORT, () => {
     console.log(`📊 Health check: http://localhost:${PORT}/health`);
     console.log(`📦 Stock API: http://localhost:${PORT}/api/stock`);
     console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+    console.log(`🧪 Formulation API: http://localhost:${PORT}/api/formulations`);
 });
 // Graceful shutdown
 process.on("SIGTERM", () => __awaiter(void 0, void 0, void 0, function* () {

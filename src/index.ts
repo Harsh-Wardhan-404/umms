@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { PrismaClient } from "./generated/prisma";
 import stockRoutes from "./routes/stockRoutes";
 import authRoutes from "./routes/authRoutes";
+import formulationRoutes from "./routes/formulationRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +23,7 @@ app.use("/uploads", express.static("uploads"));
 // Routes
 app.use("/api/stock", stockRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/formulations", formulationRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -46,6 +48,7 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📦 Stock API: http://localhost:${PORT}/api/stock`);
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+  console.log(`🧪 Formulation API: http://localhost:${PORT}/api/formulations`);
 });
 
 // Graceful shutdown
