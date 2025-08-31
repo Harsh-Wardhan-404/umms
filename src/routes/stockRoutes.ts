@@ -35,17 +35,26 @@ const upload = multer({
 // 1. Add new raw materials with supplier details
 router.post("/materials", async (req, res) => {
   try {
+    // const {
+    //   name,
+    //   type,
+    //   unit,
+    //   currentStockQty,
+    //   minThresholdQty,
+    //   supplierName,
+    //   billNumber,
+    //   quantity,
+    //   purchaseDate,
+    //   costPerUnit,
+    // } = req.body;
+
     const {
       name,
       type,
       unit,
       currentStockQty,
       minThresholdQty,
-      supplierName,
-      billNumber,
-      quantity,
-      purchaseDate,
-      costPerUnit,
+      purchaseHistory,
     } = req.body;
 
     // Validate required fields
@@ -67,14 +76,17 @@ router.post("/materials", async (req, res) => {
     }
 
     // Create purchase history entry
-    const purchaseRecord = {
-      supplierName,
-      billNumber,
-      purchaseDate: new Date(purchaseDate),
-      purchasedQty: parseFloat(quantity),
-      costPerUnit: parseFloat(costPerUnit),
-      scannedBillUrl: null, // Will be updated when bill is uploaded
-    };
+    let processedPurchaseHistory: any[] = [];
+    if (purchaseHistory && Array.isArray(purchaseHistory) && purchaseHistory.length > 0) {
+      processedPurchaseHistory = purchaseHistory.map((record: any) => ({
+        supplierName: record.supplierName || null,
+        billNumber: record.billNumber || null,
+        purchaseDate: record.purchaseDate ? new Date(record.purchaseDate) : new Date(),
+        purchasedQty: record.purchasedQty ? parseFloat(record.purchasedQty) : 0,
+        costPerUnit: record.costPerUnit ? parseFloat(record.costPerUnit) : 0,
+        scannedBillUrl: record.scannedBillUrl || null,
+      }));
+    }
 
     // Create the material
     const material = await prisma.stockManagement.create({
@@ -84,7 +96,7 @@ router.post("/materials", async (req, res) => {
         unit,
         currentStockQty: parseFloat(currentStockQty),
         minThresholdQty: parseFloat(minThresholdQty),
-        purchaseHistory: [purchaseRecord],
+        purchaseHistory: processedPurchaseHistory,
       },
     });
 

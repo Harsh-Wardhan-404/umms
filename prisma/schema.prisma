@@ -34,6 +34,14 @@ enum DispatchStatus {
   Delivered
 }
 
+enum BatchStatus {
+  Planned
+  InProgress
+  QualityCheck
+  Completed
+  Cancelled
+}
+
 model User {
   id           String   @id @default(cuid())
   username     String   @unique
@@ -129,12 +137,16 @@ model Batch {
   formulationVersionId String  @map("formulation_version_id")
   batchSize           Float    @map("batch_size")
   supervisorId        String   @map("supervisor_id")
+  workers             String[] // Array of worker user IDs
+  shift               String   @map("shift") // "Morning", "Evening", "Night"
   startTime           DateTime @map("start_time")
   endTime             DateTime? @map("end_time")
+  status              BatchStatus @default(InProgress)
   rawMaterialsUsed    Json[]   @map("raw_materials_used") // Array of material usage objects
   qrCodeData          String   @map("qr_code_data")
-  photos              Json[]   // Array of photo objects
+  photos              Json[]   // Array of photo objects with before/after packaging
   productionNotes     String?  @map("production_notes")
+  qualityChecks       Json[]   @map("quality_checks") // Array of quality check records
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
