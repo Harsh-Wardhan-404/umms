@@ -6,6 +6,9 @@ import stockRoutes from "./routes/stockRoutes";
 import authRoutes from "./routes/authRoutes";
 import formulationRoutes from "./routes/formulationRoutes";
 import batchRoutes from "./routes/batchRoutes";
+import finishedGoodsRoutes from "./routes/finishedGoodsRoutes";
+import clientRoutes from "./routes/clientRoutes";
+import invoiceRoutes from "./routes/invoiceRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -26,6 +29,9 @@ app.use("/api/stock", stockRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/formulations", formulationRoutes);
 app.use("/api/batches", batchRoutes);
+app.use("/api/finished-goods", finishedGoodsRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/invoices", invoiceRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -52,6 +58,9 @@ app.listen(PORT, () => {
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
   console.log(`🧪 Formulation API: http://localhost:${PORT}/api/formulations`);
   console.log(`🏭 Batch API: http://localhost:${PORT}/api/batches`);
+  console.log(`📦 Finished Goods API: http://localhost:${PORT}/api/finished-goods`);
+  console.log(`👥 Client API: http://localhost:${PORT}/api/clients`);
+  console.log(`🧾 Invoice API: http://localhost:${PORT}/api/invoices`);
 });
 
 // Graceful shutdown
