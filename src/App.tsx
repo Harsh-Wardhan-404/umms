@@ -18,6 +18,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/auth/signin" element={<Auth />} />
+          {/* <Route path="/" element={<Redirect />} /> */}
           <Route path="/*" element={<Home />} />
         </Routes>
       </BrowserRouter>
