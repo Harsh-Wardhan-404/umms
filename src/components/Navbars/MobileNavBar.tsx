@@ -1,10 +1,4 @@
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react";
 import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users } from "lucide-react";
 import type { MenuSection } from "./DesktopNavBar";
@@ -67,12 +61,9 @@ const MobileNavBar = () => {
             <SheetTrigger>
                 <Menu />
             </SheetTrigger>
-            <SheetContent
-                side={"left"}
-                className="block md:hidden p-5 bg-slate-200 dark:bg-gray-700 h-full overflow-y-auto"
-            >
+            <SheetContent side={"left"} className="block md:hidden p-5 bg-slate-200 dark:bg-gray-700 h-full overflow-y-auto">
                 <SheetTitle className="hidden">
-                Added cause it was required but made it hidden
+                    Added cause it was required but made it hidden
                 </SheetTitle>
 
                 <h2 className="text-lg font-semibold mb-1">Menu</h2>
@@ -100,13 +91,10 @@ const MobileNavBar = () => {
                         );
                     })}
                 </div>
-                <SheetClose asChild>
-                </SheetClose>
-
             </SheetContent>
         </Sheet>
     )
 }
 
-export default MobileNavBar
+export default MobileNavBar;
 
