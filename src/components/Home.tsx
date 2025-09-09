@@ -1,9 +1,9 @@
 import { LogOut } from "lucide-react"
 import { Route, Routes } from "react-router-dom"
 import { useState } from "react";
-import UpperNavbar from "./UpperNavbar";
-import DesktopNavBar from "./DesktopNavBar";
+import DesktopNavBar from "./Navbars/DesktopNavBar";
 import Dashboard from "./Dashboards/Dashboard";
+import UpperNavbar from "./Navbars/UpperNavbar";
 
 const Home = () => {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);

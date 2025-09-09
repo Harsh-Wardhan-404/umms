@@ -1,5 +1,6 @@
 import { Bell, CircleUserRound, Search } from 'lucide-react'
-import ThemeToggle from './ThemeToggle'
+import ThemeToggle from '../ThemeToggle'
+import MobileNavBar from './MobileNavBar'
 
 const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.SetStateAction<boolean>> }) => {
     return (
@@ -25,8 +26,12 @@ const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.Se
                     </div>
                 </div>
 
-                <div className="border border-gray-300 rounded-lg">
+                <div className="hidden md:block border border-gray-300 rounded-lg">
                     <ThemeToggle />
+                </div>
+
+                <div className='flex md:hidden justify-center items-center'>
+                    <MobileNavBar />
                 </div>
             </div>
         </div>

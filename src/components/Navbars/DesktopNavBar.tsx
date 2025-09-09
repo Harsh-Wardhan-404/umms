@@ -3,13 +3,13 @@ import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboar
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-type MenuOption = {
+export type MenuOption = {
     name: string;
     href: string;
     icon: LucideIcon;
 }
 
-interface MenuSection {
+export interface MenuSection {
     name: string;
     options: MenuOption[];
     access: string[];
