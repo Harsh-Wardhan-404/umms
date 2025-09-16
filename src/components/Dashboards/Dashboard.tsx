@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Loader from '../Loader/Loader'
+import AdminDashboard from './Admin/AdminDashboard'
 
 const Dashboard = () => {
     const [role, setRole] = useState("Admin")
@@ -10,6 +11,15 @@ const Dashboard = () => {
                 <Loader />
             </div>
         )
+    }
+
+    switch (role) {
+        case "Admin":
+            return <AdminDashboard />
+        case "User":
+            return <div>User Dashboard</div>
+        default:
+            return <div>Unknown Role</div>
     }
 }
 

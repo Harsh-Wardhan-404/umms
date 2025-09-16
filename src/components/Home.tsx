@@ -17,7 +17,7 @@ const Home = () => {
 
                 <div className="flex-1 p-5 overflow-y-auto bg-slate-100 dark:bg-[#282C35]">
                     <Routes>
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/" element={<Dashboard />} />
                     </Routes>
                 </div>
             </div>
