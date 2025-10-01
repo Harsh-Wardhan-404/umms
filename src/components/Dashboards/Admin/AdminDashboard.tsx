@@ -2,6 +2,10 @@ import { RefreshCcw } from "lucide-react"
 import { Button } from "../../ui/button"
 import CriticalAlerts from "../_Components/CriticalAlerts"
 import KeyPerformanceIndicators from "./_Components/KeyPerformanceIndicators"
+import ExpenseChart from "../_Components/ExpenseChart"
+import ProductionStatusGraph from "../_Components/ProductionStatusGraph"
+import QualityMetricsGraph from "../_Components/QualityMetricsGraph"
+import InventoryLevelCategoryGraph from "../_Components/InventoryLevelCategoryGraph"
 
 const AdminDashboard = () => {
     return (
@@ -28,7 +32,17 @@ const AdminDashboard = () => {
             <KeyPerformanceIndicators />
 
             {/* Graphical Representations */}
-            
+            <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex flex-col w-full lg:w-1/2 h-[800px] gap-4">
+                    <ExpenseChart />
+                    <ProductionStatusGraph />
+                </div>
+
+                <div className="flex flex-col w-full lg:w-1/2 h-[800px] gap-4">
+                    <QualityMetricsGraph/>
+                    <InventoryLevelCategoryGraph/>
+                </div>
+            </div>
         </div>
     )
 }
