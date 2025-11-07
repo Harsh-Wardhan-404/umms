@@ -1,7 +1,10 @@
-import { cn, role } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, type LucideIcon } from "lucide-react";
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { HomeContext } from "../HomeContext";
+
+export type Role = string | null;
 
 export type MenuOption = {
     name: string;
@@ -12,21 +15,21 @@ export type MenuOption = {
 export interface MenuSection {
     name: string;
     options: MenuOption[];
-    access: string[];
+    access: Role[];
 }
 
 const menuItems: MenuSection[] = [
     {
         name: "Overview",
         options: [
-            { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+            { name: "Dashboard", href: "/", icon: LayoutDashboard },
         ],
         access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor", "Staff", "Client"]
     },
     {
         name: "Inventory & Management",
         options: [
-            { name: "Raw Materials", href: "/inventory/raw-materials", icon: Box },
+            { name: "Inventory", href: "/inventory/inventory", icon: Box },
             { name: "Suppliers", href: "/inventory/suppliers", icon: Package },
         ],
         access: ["Admin", "Inventory Manager"]
@@ -62,6 +65,7 @@ const menuItems: MenuSection[] = [
 
 const DesktopNavBar = () => {
     const pathName = useLocation().pathname;
+    const { Role } = useContext(HomeContext);
 
     return (
         <div className="hidden md:block md:w-[225px] xl:w-[250px] p-5 bg-slate-200 dark:bg-gray-700 h-full overflow-y-auto">
@@ -69,7 +73,7 @@ const DesktopNavBar = () => {
             <div className="w-full h-[2px] bg-gray-300 dark:bg-gray-600 mb-4" />
             <div className="flex flex-col gap-5">
                 {menuItems.map((section) => {
-                    if (section.access.includes(role)) return (
+                    if (section.access.includes(Role)) return (
                         <div key={section.name} className="flex flex-col">
                             <h3 className="text-md font-semibold mb-2">{section.name}</h3>
                             <div className="flex flex-col gap-3">

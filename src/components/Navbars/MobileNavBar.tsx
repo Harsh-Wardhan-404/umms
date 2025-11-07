@@ -2,9 +2,10 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { Menu } from "lucide-react";
 import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users } from "lucide-react";
 import type { MenuSection } from "./DesktopNavBar";
-import { cn, role } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
-import React from "react";
+import React, { useContext } from "react";
+import { HomeContext } from "../HomeContext";
 
 
 const menuItems: MenuSection[] = [
@@ -56,6 +57,7 @@ const menuItems: MenuSection[] = [
 
 const MobileNavBar = () => {
     const pathName = useLocation().pathname;
+    const { Role } = useContext(HomeContext);
     return (
         <Sheet>
             <SheetTrigger>
@@ -70,7 +72,7 @@ const MobileNavBar = () => {
                 <div className="w-full h-[2px] bg-gray-300 dark:bg-gray-600 mb-4" />
                 <div className="flex flex-col gap-5">
                     {menuItems.map((section) => {
-                        if (section.access.includes(role)) return (
+                        if (section.access.includes(Role)) return (
                             <div key={section.name} className="flex flex-col">
                                 <h3 className="text-md font-semibold mb-2">{section.name}</h3>
                                 <div className="flex flex-col gap-3">

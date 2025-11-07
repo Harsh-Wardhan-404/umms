@@ -47,3 +47,98 @@ export const secondaryCardData = [
   { id: 3, title: "Active Orders", metric: 8, icon: ClockArrowUp },
   { id: 4, title: "System Users", metric: 5, icon: User },
 ];
+
+export const medicines = [
+  {
+    id: "cku1raw001",
+    name: "Paracetamol 500mg",
+    type: "Raw",
+    currentStockQty: 120,
+    minThresholdQty: 50,
+    unit: "units",
+  },
+  {
+    id: "cku1raw002",
+    name: "Amoxicillin 250mg",
+    type: "Raw",
+    currentStockQty: 30,
+    minThresholdQty: 40,
+    unit: "units",
+  },
+  {
+    id: "cku1raw003",
+    name: "Ibuprofen 400mg",
+    type: "Raw",
+    currentStockQty: 75,
+    minThresholdQty: 60,
+    unit: "units",
+  },
+  {
+    id: "cku1cons001",
+    name: "ORS Sachet",
+    type: "Consumable",
+    currentStockQty: 20,
+    minThresholdQty: 25,
+    unit: "units",
+  },
+  {
+    id: "cku1cons002",
+    name: "Cough Syrup (100ml)",
+    type: "Consumable",
+    currentStockQty: 10,
+    minThresholdQty: 15,
+    unit: "units",
+  },
+  {
+    id: "cku1raw004",
+    name: "Vitamin C 500mg",
+    type: "Raw",
+    currentStockQty: 200,
+    minThresholdQty: 100,
+    unit: "units",
+  },
+  {
+    id: "cku1pack001",
+    name: "Insulin Packaging Vial",
+    type: "Packaging",
+    currentStockQty: 300,
+    minThresholdQty: 150,
+    unit: "units",
+  },
+];
+
+
+export const formulations = [
+  {
+    id: "f1",
+    productName: "Pain Relief Gel",
+    createdAt: new Date("2024-02-10"),
+    updatedAt: new Date("2024-03-02"),
+    versions: [
+      { id: "v1", formulationId: "f1", versionNumber: 1, isLocked: true, creatorId: "u1", creationDate: new Date("2024-02-10") },
+      { id: "v2", formulationId: "f1", versionNumber: 2, isLocked: false, creatorId: "u1", creationDate: new Date("2024-03-02") }
+    ]
+  },
+  {
+    id: "f2",
+    productName: "Herbal Shampoo",
+    createdAt: new Date("2024-01-15"),
+    updatedAt: new Date("2024-01-30"),
+    versions: [
+      { id: "v3", formulationId: "f2", versionNumber: 1, isLocked: false, creatorId: "u2", creationDate: new Date("2024-01-15") }
+    ]
+  },
+  {
+    id: "f3",
+    productName: "Disinfectant Solution",
+    createdAt: new Date("2024-03-01"),
+    updatedAt: new Date("2024-03-05"),
+    versions: [
+      { id: "v4", formulationId: "f3", versionNumber: 1, isLocked: true, creatorId: "u3", creationDate: new Date("2024-03-01") },
+      { id: "v5", formulationId: "f3", versionNumber: 2, isLocked: false, creatorId: "u3", creationDate: new Date("2024-03-05") }
+    ]
+  }
+];
+
+
+
