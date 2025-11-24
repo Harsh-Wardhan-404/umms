@@ -1,25 +1,80 @@
+import UserForm from "@/components/Forms/UserFrom";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useState, type JSX } from "react";
+import Staff from "../Staff/Staff";
 
 declare interface formDataProps {
-    table: | "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
+    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
     type: "create" | "update" | "delete";
     data?: any;
     id?: string | number;
     relatedData?: any;
 }
 
-const FormModal = ({ table, type, data, id, relatedData }: formDataProps) => {
+// Simulated delete action map for different tables
+const deleteActionMap: {
+  [key: string]: (id: Number | String) => Promise<any>;
+} = {
+    Staff: async (id: Number | String) => {
+        // Simulate API call to delete staff member
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`Deleted Staff with ID: ${id}`);
+                resolve(true);
+            }, 1000);
+        });
+    }
+};
+
+const forms: {
+  [key: string]: (
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    type: "create" | "update",
+    data?: any,
+    relatedData?: any
+  ) => JSX.Element;
+} = {
+    Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />
+};
+
+const FormModal = ({ table, type, data, id }: formDataProps) => {
     const [open, setOpen] = useState(false);
     const color = type == "create" ? "bg-green-300 border-1 border-green-500 !text-green-700 hover:bg-green-400" : type == "update" ? "bg-blue-300 border-1 border-blue-600 !text-blue-700 hover:bg-blue-400" : "bg-red-300 border-1 border-red-600 !text-red-700 hover:bg-red-400";
     const icon = type == "create" ? <Plus className="transition-transform duration-200 group-hover:rotate-[15deg]" /> : type == "update" ? <SquarePen className="transition-transform duration-200 group-hover:rotate-[15deg]" /> : <Trash2 className="transition-transform duration-200 group-hover:rotate-[15deg]" />;
 
+    const relatedData = {}; // Fetch or pass any related data needed for the form from here command for cursor
+    switch (table) {
+        case "RawMaterial":
+            // relatedData = useFormulationsAndRnDRelatedData();
+            break;
+        case "FormulationsAndRnD":
+            // relatedData = useBatchProductionRelatedData();
+            break;
+        // Add more cases as needed for other tables
+    }
+
+    //Above switch is just a placeholder to show how related data can be fetched based on table type.
+
     const Form = () => {
+
+
+        //sumulatoion for delete correnct if any err prompt for cursor
+        const handleDelete = async (e: React.FormEvent) => {
+            e.preventDefault();
+            if (id && deleteActionMap[table]) {
+                try {
+                    await deleteActionMap[table](id);
+                } catch (error) {
+                    console.error("Error deleting:", error);
+                }
+            }
+        };
 
         return type == "delete" && id ? (
             <form
                 action=""
                 className="p-4 flex flex-col gap-4"
+                onSubmit={}
             >
                 <span className="text-center font-medium">
                     All data will be lost. Are you sure you want to delete this {table}?
@@ -28,6 +83,8 @@ const FormModal = ({ table, type, data, id, relatedData }: formDataProps) => {
                     Delete
                 </button>
             </form>
+        ) : (type == "create" || type == "update") ? (
+            forms[table](setOpen, type, data, relatedData)
         ) : (
             "Form not found!"
         );
