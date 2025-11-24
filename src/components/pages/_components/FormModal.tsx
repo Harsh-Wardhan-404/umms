@@ -1,4 +1,5 @@
 import UserForm from "@/components/Forms/UserFrom";
+import MaterialForm from "@/components/Forms/MaterialForm";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
@@ -20,6 +21,11 @@ const deleteActionMap: {
         // API call to delete staff member
         const response = await api.delete(`/api/users/${id}`);
         return response.data;
+    },
+    RawMaterial: async (id: Number | String) => {
+        // API call to delete material
+        const response = await api.delete(`/api/stock/materials/${id}`);
+        return response.data;
     }
 };
 
@@ -31,7 +37,8 @@ const forms: {
     relatedData?: any
   ) => JSX.Element;
 } = {
-    Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />
+    Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />,
+    RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />
 };
 
 const FormModal = ({ table, type, data, id }: formDataProps) => {
