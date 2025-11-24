@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, type LucideIcon } from "lucide-react";
+import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, FileText, type LucideIcon } from "lucide-react";
 import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HomeContext } from "../HomeContext";
@@ -44,13 +44,13 @@ const menuItems: MenuSection[] = [
         access: ["Admin", "Production Manager"]
     },
     {
-        name: "Business Operations",
+        name: "Sales & Billing",
         options: [
-            { name: "Order Management", href: "/business-operations/order-management", icon: ShoppingCart },
-            { name: "Financial Management", href: "/business-operations/financial-management", icon: Users },
-            { name: "Client Management", href: "/business-operations/client-management", icon: User },
+            { name: "Finished Goods", href: "/sales/finished-goods", icon: Package },
+            { name: "Clients", href: "/sales/clients", icon: Users },
+            { name: "Invoices", href: "/sales/invoices", icon: FileText },
         ],
-        access: ["Admin"]
+        access: ["Admin", "Inventory Manager"]
     },
     {
         name: "Administration",

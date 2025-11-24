@@ -17,6 +17,12 @@ import FormulationDetails from "./pages/FormulationsRnD/FormulationDetails";
 import QualityControl from "./pages/QualityControl/QualityControl";
 import Staff from "./pages/Staff/Staff";
 import StaffDetails from "./pages/OneStaffDetail/StaffDetails";
+import FinishedGoods from "./pages/FinishedGoods/FinishedGoods";
+import Clients from "./pages/Clients/Clients";
+import Invoices from "./pages/Invoices/Invoices";
+import CreateInvoiceWizard from "./pages/Invoices/CreateInvoiceWizard";
+import InvoiceDetails from "./pages/Invoices/InvoiceDetails";
+import InvoicePrint from "./pages/Invoices/InvoicePrint";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
@@ -59,6 +65,12 @@ const Home = () => {
                             <Route path="/production/batch-production/:id" element={<BatchDetails />} />
                             <Route path="/production/batch-production/:id/report" element={<ProductionReport />} />
                             <Route path="/production/quality-control" element={<QualityControl />} />
+                            <Route path="/sales/finished-goods" element={<FinishedGoods />} />
+                            <Route path="/sales/clients" element={<Clients />} />
+                            <Route path="/sales/invoices" element={<Invoices />} />
+                            <Route path="/sales/invoices/create" element={<CreateInvoiceWizard />} />
+                            <Route path="/sales/invoices/:id" element={<InvoiceDetails />} />
+                            <Route path="/sales/invoices/:id/print" element={<InvoicePrint />} />
                             <Route path="/staff" element={<Staff />} />
                             <Route path="/user/:id" element={<StaffDetails/>} />
                         </Routes>

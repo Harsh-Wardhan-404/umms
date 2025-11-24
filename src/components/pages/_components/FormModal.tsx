@@ -1,13 +1,15 @@
 import UserForm from "@/components/Forms/UserFrom";
 import MaterialForm from "@/components/Forms/MaterialForm";
 import FormulationForm from "@/components/Forms/FormulationForm";
+import FinishedGoodForm from "@/components/Forms/FinishedGoodForm";
+import ClientForm from "@/components/Forms/ClientForm";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
 import api from "@/lib/api";
 
 declare interface formDataProps {
-    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
+    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices"
     type: "create" | "update" | "delete";
     data?: any;
     id?: string | number;
@@ -37,6 +39,21 @@ const deleteActionMap: {
         // API call to delete batch
         const response = await api.delete(`/api/batches/${id}`);
         return response.data;
+    },
+    FinishedGoods: async (id: Number | String) => {
+        // API call to delete finished good
+        const response = await api.delete(`/api/finished-goods/${id}`);
+        return response.data;
+    },
+    Clients: async (id: Number | String) => {
+        // API call to deactivate client
+        const response = await api.patch(`/api/clients/${id}`, { isActive: false });
+        return response.data;
+    },
+    Invoices: async (id: Number | String) => {
+        // API call to delete invoice
+        const response = await api.delete(`/api/invoices/${id}`);
+        return response.data;
     }
 };
 
@@ -50,7 +67,9 @@ const forms: {
 } = {
     Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />,
     RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />,
-    FormulationsAndRnD: (setOpen, type, data, relatedData) => <FormulationForm setOpen={setOpen} type={type} />
+    FormulationsAndRnD: (setOpen, type, data, relatedData) => <FormulationForm setOpen={setOpen} type={type} />,
+    FinishedGoods: (setOpen, type, data, relatedData) => <FinishedGoodForm setOpen={setOpen} type={type} data={data} />,
+    Clients: (setOpen, type, data, relatedData) => <ClientForm setOpen={setOpen} type={type} data={data} />
 };
 
 const FormModal = ({ table, type, data, id }: formDataProps) => {
@@ -116,6 +135,8 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                             <>{data.productName}</>
                         ) : data.batchCode ? (
                             <>Batch: {data.batchCode}</>
+                        ) : data.invoiceNumber ? (
+                            <>Invoice: {data.invoiceNumber}</>
                         ) : data.name ? (
                             <>{data.name}</>
                         ) : null}
