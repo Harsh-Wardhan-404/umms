@@ -4,6 +4,7 @@ import Auth from './components/Auth/Auth'
 import Home from './components/Home'
 import Maintenance from './components/Maintanence/Maintenance';
 import { MAINTENANCE_MODE } from '@/lib/envVariables';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 function App() {
 
@@ -16,11 +17,12 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Routes>
-          <Route path="/auth/signin" element={<Auth />} />
-          {/* <Route path="/" element={<Redirect />} /> */}
-          <Route path="/*" element={<Home />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth/signin" element={<Auth />} />
+            <Route path="/*" element={<Home />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </>
   )
