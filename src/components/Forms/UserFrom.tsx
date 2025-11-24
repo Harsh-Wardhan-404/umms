@@ -10,7 +10,7 @@ const UserSchema = z.object({
     role: z.enum(["Admin", "ProductionManager", "InventoryManager", "Supervisor", "Staff", "Client"]),
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters long" }).optional(),
+    password: z.string().min(6, { message: "Password must be at least 6 characters long" }).optional().or(z.literal("")),
 });
 
 export type userSchema = z.infer<typeof UserSchema>;
