@@ -13,6 +13,7 @@ import FormulationsAndRnD from "./pages/FormulationsRnD/FormulationsAndRnD";
 import QualityControl from "./pages/QualityControl/QualityControl";
 import Staff from "./pages/Staff/Staff";
 import StaffDetails from "./pages/OneStaffDetail/StaffDetails";
+import OneFormulationDetails from "./pages/OneFormulationDetails/OneFormulationDetails";
 
 const Home = () => {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
@@ -41,7 +42,7 @@ const Home = () => {
                             <Route path="/inventory/inventory" element={<RawMaterial />} />
                             <Route path="/inventory/suppliers" element={<Suppliers />} />
                             <Route path="/production/formulations-and-rd" element={<FormulationsAndRnD />} />
-                            <Route path="/production/formulations/:id" element={<div>Formulation Details</div>} />
+                            <Route path="/production/formulations/:id" element={<OneFormulationDetails />} />
                             <Route path="/production/batch-production" element={<BatchProduction />} />
                             <Route path="/production/quality-control" element={<QualityControl />} />
                             <Route path="/staff" element={<Staff />} />

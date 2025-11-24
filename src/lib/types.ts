@@ -3,7 +3,12 @@
 export type UserRole = "Admin" | "Supervisor" | "Worker" | "Dispatch" | "Sales";
 export type StockType = "Raw" | "Packaging" | "Consumable";
 export type DispatchStatus = "Ready" | "InTransit" | "Delivered";
-export type BatchStatus = "Planned" | "InProgress" | "QualityCheck" | "Completed" | "Cancelled";
+export type BatchStatus =
+  | "Planned"
+  | "InProgress"
+  | "QualityCheck"
+  | "Completed"
+  | "Cancelled";
 
 export interface User {
   id?: string;
@@ -63,9 +68,6 @@ export interface Formulation {
   versions?: FormulationVersion[];
   createdAt: Date;
   updatedAt: Date;
-
-  batches?: Batch[];
-  finishedGoods?: FinishedGood[];
 }
 
 export interface FormulationVersion {
@@ -81,6 +83,7 @@ export interface FormulationVersion {
   formulation?: Formulation;
   creator?: User;
   batches?: Batch[];
+  finishedGoods?: FinishedGood[];
 }
 
 export interface FormulationIngredient {
