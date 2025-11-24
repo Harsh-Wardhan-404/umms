@@ -52,7 +52,7 @@ const FormulationsAndRnD = () => {
     return (
       <tr
         key={item.id}
-        className="border-b border-gray-200 hover:bg-lamaPurpleLight even:bg-slate-50"
+        className="border-b border-gray-200 hover:bg-lamaPurpleLight even:bg-slate-50 dark:even:bg-slate-700"
       >
         <td className="py-3 px-2">{item.productName}</td>
         <td className="py-3 px-2">{latestVersion?.versionNumber}</td>
@@ -60,10 +60,10 @@ const FormulationsAndRnD = () => {
         <td className="hidden md:table-cell py-3 px-2">{item.updatedAt.toLocaleDateString()}</td>
         <td className="py-3 px-2">
           <div className="flex gap-2">
-            <Link to={`/formulations/${item.id}`} className="text-blue-500 hover:underline">
-                <Button className="flex justify-center items-center w-8 h-8 bg-blue-300 border-1 border-blue-500 !text-blue-700 hover:bg-blue-400 rounded-md cursor-pointer group">
-                  <Eye />
-                </Button>
+            <Link to={`/production/formulations/${item.id}`} className="text-blue-500 hover:underline">
+              <Button className="flex justify-center items-center w-8 h-8 bg-blue-300 border-1 border-blue-500 !text-blue-700 hover:bg-blue-400 rounded-md cursor-pointer group">
+                <Eye />
+              </Button>
             </Link>
             <FormModal table="RawMaterial" type="delete" id={item.id} />
           </div>

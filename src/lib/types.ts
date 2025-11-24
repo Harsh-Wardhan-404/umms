@@ -6,15 +6,15 @@ export type DispatchStatus = "Ready" | "InTransit" | "Delivered";
 export type BatchStatus = "Planned" | "InProgress" | "QualityCheck" | "Completed" | "Cancelled";
 
 export interface User {
-  id: string;
-  username: string;
-  email: string;
-  passwordHash: string;
-  role: UserRole;
-  firstName: string;
-  lastName: string;
-  createdAt: Date;
-  updatedAt: Date;
+  id?: string;
+  username?: string;
+  email?: string;
+  passwordHash?: string;
+  role?: UserRole;
+  firstName?: string;
+  lastName?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   createdFormulations?: FormulationVersion[];
   supervisedBatches?: Batch[];
@@ -220,8 +220,8 @@ export interface Feedback {
 }
 
 export interface WorkerEfficiency {
-  id: string;
-  userId: string;
+  id?: string;
+  userId?: string;
   standardOutputQtyPerShift: number;
   punctualityScore: number;
   efficiencyRating: number;

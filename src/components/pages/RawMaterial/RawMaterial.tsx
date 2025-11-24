@@ -58,7 +58,7 @@ const RawMaterial = () => {
     const rowLoader = (item: StockManagement) => (
         <tr
             key={item.id}
-            className="border-b border-gray-200 hover:bg-lamaPurpleLight even:bg-slate-50"
+            className="border-b border-gray-200 even:bg-slate-50 dark:even:bg-slate-700"
         >
             <td className="py-3 px-2">{item.name}</td>
             <td className="hidden md:table-cell py-3 px-2">{getCategoryBadgeStyle(item.type)}</td>

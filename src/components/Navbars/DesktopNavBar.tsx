@@ -55,7 +55,7 @@ const menuItems: MenuSection[] = [
     {
         name: "Administration",
         options: [
-            { name: "Staff Performance", href: "/administration/staff-performance", icon: Users },
+            { name: "Staff", href: "/staff", icon: User },
             { name: "Analytics & Reports", href: "/administration/analytics-and-reports", icon: ChartBar },
             { name: "User Management", href: "/administration/settings", icon: Cog },
         ],
@@ -66,6 +66,7 @@ const menuItems: MenuSection[] = [
 const DesktopNavBar = () => {
     const pathName = useLocation().pathname;
     const { Role } = useContext(HomeContext);
+    console.log("Role in DesktopNavBar:", Role);
 
     return (
         <div className="hidden md:block md:w-[225px] xl:w-[250px] p-5 bg-slate-200 dark:bg-gray-700 h-full overflow-y-auto">

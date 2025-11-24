@@ -140,5 +140,12 @@ export const formulations = [
   }
 ];
 
+export const users = [
+  { id: "u1", firstName: "Akhilesh", lastName: "Patil", email: "akhilesh.patil@example.com", role: "Admin" },
+  { id: "u2", firstName: "Sneha", lastName: "Shah", email: "sneha.shah@example.com", role: "Staff" },
+  { id: "u3", firstName: "Rohan", lastName: "Mehta", email: "rohan.mehta@example.com", role: "Staff" },
+  { id: "u4", firstName: "Priya", lastName: "Kulkarni", email: "priya.kulkarni@example.com", role: "Staff" }
+]
+
 
 

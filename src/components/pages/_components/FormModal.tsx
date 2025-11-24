@@ -2,11 +2,7 @@ import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 declare interface formDataProps {
-    table:
-    | "RawMaterial"
-    | "Suppliers"
-    | "FormulationsAndRnD"
-    | "BatchProduction"
+    table: | "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
     type: "create" | "update" | "delete";
     data?: any;
     id?: string | number;
