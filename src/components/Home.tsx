@@ -9,6 +9,9 @@ import { HomeContext } from "./HomeContext";
 import RawMaterial from "./pages/RawMaterial/RawMaterial";
 import Suppliers from "./pages/Suppliers/Suppliers";
 import BatchProduction from "./pages/BatchProduction/BatchProduction";
+import CreateBatchWizard from "./pages/BatchProduction/CreateBatchWizard";
+import BatchDetails from "./pages/BatchProduction/BatchDetails";
+import ProductionReport from "./pages/BatchProduction/ProductionReport";
 import FormulationsAndRnD from "./pages/FormulationsRnD/FormulationsAndRnD";
 import FormulationDetails from "./pages/FormulationsRnD/FormulationDetails";
 import QualityControl from "./pages/QualityControl/QualityControl";
@@ -52,6 +55,9 @@ const Home = () => {
                             <Route path="/production/formulations-and-rd" element={<FormulationsAndRnD />} />
                             <Route path="/production/formulations/:id" element={<FormulationDetails />} />
                             <Route path="/production/batch-production" element={<BatchProduction />} />
+                            <Route path="/production/batch-production/create" element={<CreateBatchWizard />} />
+                            <Route path="/production/batch-production/:id" element={<BatchDetails />} />
+                            <Route path="/production/batch-production/:id/report" element={<ProductionReport />} />
                             <Route path="/production/quality-control" element={<QualityControl />} />
                             <Route path="/staff" element={<Staff />} />
                             <Route path="/user/:id" element={<StaffDetails/>} />

@@ -32,6 +32,11 @@ const deleteActionMap: {
         // API call to delete formulation
         const response = await api.delete(`/api/formulations/${id}`);
         return response.data;
+    },
+    BatchProduction: async (id: Number | String) => {
+        // API call to delete batch
+        const response = await api.delete(`/api/batches/${id}`);
+        return response.data;
     }
 };
 
@@ -109,6 +114,8 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                             <>{data.firstName} {data.lastName} ({data.email})</>
                         ) : data.productName ? (
                             <>{data.productName}</>
+                        ) : data.batchCode ? (
+                            <>Batch: {data.batchCode}</>
                         ) : data.name ? (
                             <>{data.name}</>
                         ) : null}
