@@ -1,6 +1,7 @@
 import UserForm from "@/components/Forms/UserFrom";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
+import Staff from "../Staff/Staff";
 
 declare interface formDataProps {
     table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
@@ -9,6 +10,21 @@ declare interface formDataProps {
     id?: string | number;
     relatedData?: any;
 }
+
+// Simulated delete action map for different tables
+const deleteActionMap: {
+  [key: string]: (id: Number | String) => Promise<any>;
+} = {
+    Staff: async (id: Number | String) => {
+        // Simulate API call to delete staff member
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`Deleted Staff with ID: ${id}`);
+                resolve(true);
+            }, 1000);
+        });
+    }
+};
 
 const forms: {
   [key: string]: (
@@ -41,10 +57,24 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
 
     const Form = () => {
 
+
+        //sumulatoion for delete correnct if any err prompt for cursor
+        const handleDelete = async (e: React.FormEvent) => {
+            e.preventDefault();
+            if (id && deleteActionMap[table]) {
+                try {
+                    await deleteActionMap[table](id);
+                } catch (error) {
+                    console.error("Error deleting:", error);
+                }
+            }
+        };
+
         return type == "delete" && id ? (
             <form
                 action=""
                 className="p-4 flex flex-col gap-4"
+                onSubmit={}
             >
                 <span className="text-center font-medium">
                     All data will be lost. Are you sure you want to delete this {table}?
