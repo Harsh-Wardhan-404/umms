@@ -155,11 +155,13 @@ const FinishedGoods = () => {
         <td className="py-3 px-2">
           <div className="flex gap-2">
             <Button
-              onClick={() => navigate(`/sales/finished-goods/${item.id}`)}
+              onClick={() => navigate(`/production/batch-production/${item.batchId}`)}
               className="flex justify-center items-center w-8 h-8 bg-blue-300 border-1 border-blue-500 !text-blue-700 hover:bg-blue-400 rounded-md cursor-pointer"
+              title="View Batch Details"
             >
               <Eye size={16} />
             </Button>
+            <FormModal table="FinishedGoods" type="update" id={item.id} data={item} />
             <FormModal table="FinishedGoods" type="delete" id={item.id} data={item} />
           </div>
         </td>
