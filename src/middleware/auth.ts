@@ -110,8 +110,8 @@ export const requireRole = (allowedRoles: string[]) => {
 
 // Specific role middleware functions
 export const requireAdmin = requireRole(["Admin"]);
-export const requireManager = requireRole(["Admin", "Manager"]);
-export const requireWorker = requireRole(["Admin", "Manager", "Worker"]);
+export const requireManager = requireRole(["Admin", "InventoryManager", "ProductionManager"]);
+export const requireSupervisor = requireRole(["Admin", "InventoryManager", "ProductionManager", "Supervisor"]);
 
 // Helper function to create authenticated route handlers
 export function createAuthHandler<T extends Request = Request>(
