@@ -222,12 +222,12 @@ export interface Feedback {
 export interface WorkerEfficiency {
   id?: string;
   userId?: string;
-  standardOutputQtyPerShift: number;
-  punctualityScore: number;
-  efficiencyRating: number;
-  batchHistory: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  standardOutputQtyPerShift?: number;
+  punctualityScore?: number;
+  efficiencyRating?: number;
+  batchHistory?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 
   user?: User;
 }
