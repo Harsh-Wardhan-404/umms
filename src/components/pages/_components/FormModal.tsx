@@ -1,5 +1,6 @@
 import UserForm from "@/components/Forms/UserFrom";
 import MaterialForm from "@/components/Forms/MaterialForm";
+import FormulationForm from "@/components/Forms/FormulationForm";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
@@ -26,6 +27,11 @@ const deleteActionMap: {
         // API call to delete material
         const response = await api.delete(`/api/stock/materials/${id}`);
         return response.data;
+    },
+    FormulationsAndRnD: async (id: Number | String) => {
+        // API call to delete formulation
+        const response = await api.delete(`/api/formulations/${id}`);
+        return response.data;
     }
 };
 
@@ -38,7 +44,8 @@ const forms: {
   ) => JSX.Element;
 } = {
     Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />,
-    RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />
+    RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />,
+    FormulationsAndRnD: (setOpen, type, data, relatedData) => <FormulationForm setOpen={setOpen} type={type} />
 };
 
 const FormModal = ({ table, type, data, id }: formDataProps) => {
@@ -98,7 +105,13 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                 )}
                 {data && (
                     <div className="text-sm text-gray-600 text-center">
-                        {data.firstName} {data.lastName} ({data.email})
+                        {data.firstName && data.lastName ? (
+                            <>{data.firstName} {data.lastName} ({data.email})</>
+                        ) : data.productName ? (
+                            <>{data.productName}</>
+                        ) : data.name ? (
+                            <>{data.name}</>
+                        ) : null}
                     </div>
                 )}
                 <button 

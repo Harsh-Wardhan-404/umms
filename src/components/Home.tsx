@@ -10,10 +10,10 @@ import RawMaterial from "./pages/RawMaterial/RawMaterial";
 import Suppliers from "./pages/Suppliers/Suppliers";
 import BatchProduction from "./pages/BatchProduction/BatchProduction";
 import FormulationsAndRnD from "./pages/FormulationsRnD/FormulationsAndRnD";
+import FormulationDetails from "./pages/FormulationsRnD/FormulationDetails";
 import QualityControl from "./pages/QualityControl/QualityControl";
 import Staff from "./pages/Staff/Staff";
 import StaffDetails from "./pages/OneStaffDetail/StaffDetails";
-import OneFormulationDetails from "./pages/OneFormulationDetails/OneFormulationDetails";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
@@ -50,7 +50,7 @@ const Home = () => {
                             <Route path="/inventory/inventory" element={<RawMaterial />} />
                             <Route path="/inventory/suppliers" element={<Suppliers />} />
                             <Route path="/production/formulations-and-rd" element={<FormulationsAndRnD />} />
-                            <Route path="/production/formulations/:id" element={<OneFormulationDetails />} />
+                            <Route path="/production/formulations/:id" element={<FormulationDetails />} />
                             <Route path="/production/batch-production" element={<BatchProduction />} />
                             <Route path="/production/quality-control" element={<QualityControl />} />
                             <Route path="/staff" element={<Staff />} />
