@@ -55,9 +55,7 @@ const menuItems: MenuSection[] = [
     {
         name: "Administration",
         options: [
-            { name: "Staff", href: "/staff", icon: User },
-            { name: "Analytics & Reports", href: "/administration/analytics-and-reports", icon: ChartBar },
-            { name: "User Management", href: "/administration/settings", icon: Cog },
+            { name: "Staff", href: "/staff", icon: User }
         ],
         access: ["Admin", "Inventory Manager"]
     }
