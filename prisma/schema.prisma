@@ -16,11 +16,12 @@ datasource db {
 
 enum UserRole {
   Admin
+  InventoryManager
+  ProductionManager
   Supervisor
-  Worker
-  Dispatch
-  Sales
+  Staff
 }
+
 
 enum StockType {
   Raw
@@ -110,10 +111,6 @@ model Formulation {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  batches        Batch[]
-  finishedGoods  FinishedGood[]
-
   @@map("formulations")
 }
 
@@ -128,9 +125,10 @@ model FormulationVersion {
   ingredients  FormulationIngredient[]
   
   // Relations
-  formulation Formulation @relation(fields: [formulationId], references: [id])
-  creator     User        @relation(fields: [creatorId], references: [id])
-  batches     Batch[]
+  formulation   Formulation @relation(fields: [formulationId], references: [id], onDelete: Cascade)
+  creator       User        @relation(fields: [creatorId], references: [id])
+  batches       Batch[]
+  finishedGoods FinishedGood[]
 
   @@unique([formulationId, versionNumber])
   @@map("formulation_versions")
@@ -145,7 +143,7 @@ model FormulationIngredient {
   notes                 String?
   
   // Relations
-  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id])
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id], onDelete: Cascade)
   material           StockManagement    @relation(fields: [materialId], references: [id])
 
   @@map("formulation_ingredients")
@@ -172,11 +170,10 @@ model Batch {
   updatedAt           DateTime @updatedAt @map("updated_at")
 
   // Relations
-  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id])
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id], onDelete: Cascade)
   supervisor         User               @relation(fields: [supervisorId], references: [id])
   finishedGood       FinishedGood?
   materialsUsed      BatchMaterial[]
-  formulation        Formulation        @relation(fields: [productName], references: [productName])
 
   @@map("batches")
 }
@@ -188,28 +185,29 @@ model BatchMaterial {
   quantityUsed Float @map("quantity_used")
   
   // Relations
-  batch   Batch          @relation(fields: [batchId], references: [id])
+  batch   Batch          @relation(fields: [batchId], references: [id], onDelete: Cascade)
   material StockManagement @relation(fields: [materialId], references: [id])
 
   @@map("batch_materials")
 }
 
 model FinishedGood {
-  id               String   @id @default(cuid())
-  batchId          String   @unique @map("batch_id")
-  productName      String   @map("product_name")
-  quantityProduced Float    @map("quantity_produced")
-  availableQuantity Float   @map("available_quantity") // Quantity available for sale
-  unitPrice        Float    @map("unit_price") // Price per unit
-  hsnCode          String   @map("hsn_code") // HSN code for GST
-  qualityStatus    String   @default("Approved") @map("quality_status") // Approved, Pending, Rejected
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id                   String   @id @default(cuid())
+  batchId              String   @unique @map("batch_id")
+  productName          String   @map("product_name")
+  formulationVersionId String   @map("formulation_version_id")
+  quantityProduced     Float    @map("quantity_produced")
+  availableQuantity    Float    @map("available_quantity") // Quantity available for sale
+  unitPrice            Float    @map("unit_price") // Price per unit
+  hsnCode              String   @map("hsn_code") // HSN code for GST
+  qualityStatus        String   @default("Approved") @map("quality_status") // Approved, Pending, Rejected
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
   // Relations
-  batch    Batch     @relation(fields: [batchId], references: [id])
-  formulation Formulation @relation(fields: [productName], references: [productName])
-  invoiceItems InvoiceItem[]
+  batch              Batch              @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id])
+  invoiceItems       InvoiceItem[]
 
   @@map("finished_goods")
 }
@@ -235,7 +233,7 @@ model Invoice {
   invoiceItems InvoiceItem[]
   dispatch     Dispatch?
   creator      User       @relation(fields: [creatorId], references: [id])
-  client       Client     @relation(fields: [clientId], references: [id])
+  client       Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("invoices")
 }
@@ -250,7 +248,7 @@ model InvoiceItem {
   pricePerUnit  Float  @map("price_per_unit")
   
   // Relations
-  invoice      Invoice     @relation(fields: [invoiceId], references: [id])
+  invoice      Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   finishedGood FinishedGood @relation(fields: [finishedGoodId], references: [id])
 
   @@map("invoice_items")
@@ -268,7 +266,7 @@ model Dispatch {
   updatedAt   DateTime       @updatedAt @map("updated_at")
 
   // Relations
-  invoice   Invoice   @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   feedback  Feedback?
   creator   User      @relation(fields: [creatorId], references: [id])
 
@@ -290,8 +288,8 @@ model Feedback {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
-  dispatch Dispatch @relation(fields: [dispatchId], references: [id])
-  client   Client  @relation(fields: [clientId], references: [id])
+  dispatch Dispatch @relation(fields: [dispatchId], references: [id], onDelete: Cascade)
+  client   Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("feedback")
 }
