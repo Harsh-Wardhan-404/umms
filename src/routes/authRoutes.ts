@@ -55,7 +55,7 @@ router.post("/signup", async (req, res) => {
         passwordHash,
         firstName,
         lastName,
-        role: role || "Worker", // Default role if not specified
+        role: role || "Staff", // Default role if not specified
         username: email.split('@')[0], // Generate username from email
       },
       select: {

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { PrismaClient } from "./generated/prisma";
 import stockRoutes from "./routes/stockRoutes";
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
 import formulationRoutes from "./routes/formulationRoutes";
 import batchRoutes from "./routes/batchRoutes";
 import finishedGoodsRoutes from "./routes/finishedGoodsRoutes";
@@ -27,6 +28,7 @@ app.use("/uploads", express.static("uploads"));
 // Routes
 app.use("/api/stock", stockRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/formulations", formulationRoutes);
 app.use("/api/batches", batchRoutes);
 app.use("/api/finished-goods", finishedGoodsRoutes);
@@ -56,6 +58,7 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📦 Stock API: http://localhost:${PORT}/api/stock`);
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+  console.log(`👤 User API: http://localhost:${PORT}/api/users`);
   console.log(`🧪 Formulation API: http://localhost:${PORT}/api/formulations`);
   console.log(`🏭 Batch API: http://localhost:${PORT}/api/batches`);
   console.log(`📦 Finished Goods API: http://localhost:${PORT}/api/finished-goods`);

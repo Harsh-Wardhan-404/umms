@@ -28,6 +28,9 @@ router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async 
     // Check if batch exists and is completed
     const batch = await prisma.batch.findUnique({
       where: { id: batchId },
+      include: {
+        formulationVersion: true,
+      },
     });
 
     if (!batch) {
@@ -52,6 +55,7 @@ router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async 
       data: {
         batchId,
         productName,
+        formulationVersionId: batch.formulationVersionId, // Get from batch
         quantityProduced: parseFloat(quantityProduced),
         availableQuantity: parseFloat(availableQuantity),
         unitPrice: parseFloat(unitPrice),
