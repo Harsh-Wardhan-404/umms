@@ -1,11 +1,11 @@
 import { Download, Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormModal from "../_components/FormModal";
 import Table from "../_components/Table";
-import { users } from "@/lib/constants";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { User } from "@/lib/types";
+import api from "@/lib/api";
 
 const columns = [
   {
@@ -28,11 +28,38 @@ const columns = [
 ];
 
 const Staff = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     name: "",
     category: "",
     status: ""
   });
+
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get("/api/users", {
+        params: {
+          search: filters.name || undefined,
+          limit: 100,
+        },
+      });
+      setUsers(response.data.users || []);
+    } catch (err: any) {
+      console.error("Error fetching users:", err);
+      setError(err.response?.data?.error || "Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -40,7 +67,16 @@ const Staff = () => {
       ...prev,
       [name]: value
     }));
-  }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchUsers();
+  };
+
+  const handleDeleteSuccess = () => {
+    fetchUsers(); // Refresh the list after deletion
+  };
 
   const rowLoader = (item: User) => {
     return (
@@ -58,7 +94,8 @@ const Staff = () => {
                 <Eye />
               </Button>
             </Link>
-            <FormModal table="Staff" type="delete" id={item.id} />
+            <FormModal table="Staff" type="update" data={item} id={item.id} />
+            <FormModal table="Staff" type="delete" id={item.id} data={item} />
           </div>
         </td>
       </tr>
@@ -84,13 +121,35 @@ const Staff = () => {
 
       <div className="h-0.5 bg-gray-200 dark:bg-gray-700" />
 
-      <form className="relative w-full border border-gray-300 rounded-md p-4">
+      <form className="relative w-full border border-gray-300 rounded-md p-4" onSubmit={handleSearch}>
         <span className="absolute -top-4 text-gray-500 text-lg px-1 tracking-wide bg-slate-100 dark:bg-[#282C35]">Filters</span>
         <div className="flex gap-4 w-full flex-wrap">
-          <input type="text" placeholder="Search by Staff Name" className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" name="name" value={filters.name} onChange={handleFilterChange} />
+          <input 
+            type="text" 
+            placeholder="Search by Staff Name, Email, or Username" 
+            className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            name="name" 
+            value={filters.name} 
+            onChange={handleFilterChange} 
+          />
+          <button 
+            type="submit" 
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-6 py-2"
+          >
+            Search
+          </button>
         </div>
       </form>
-      <Table columns={columns} data={users} renderRow={rowLoader} />
+
+      {loading ? (
+        <div className="text-center py-8">Loading users...</div>
+      ) : error ? (
+        <div className="text-center py-8 text-red-500">{error}</div>
+      ) : users.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">No users found</div>
+      ) : (
+        <Table columns={columns} data={users} renderRow={rowLoader} />
+      )}
     </div>
   )
 }

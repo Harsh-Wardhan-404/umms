@@ -2,6 +2,7 @@ import UserForm from "@/components/Forms/UserFrom";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
+import api from "@/lib/api";
 
 declare interface formDataProps {
     table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff"
@@ -11,18 +12,14 @@ declare interface formDataProps {
     relatedData?: any;
 }
 
-// Simulated delete action map for different tables
+// Delete action map for different tables
 const deleteActionMap: {
   [key: string]: (id: Number | String) => Promise<any>;
 } = {
     Staff: async (id: Number | String) => {
-        // Simulate API call to delete staff member
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log(`Deleted Staff with ID: ${id}`);
-                resolve(true);
-            }, 1000);
-        });
+        // API call to delete staff member
+        const response = await api.delete(`/api/users/${id}`);
+        return response.data;
     }
 };
 
@@ -56,16 +53,24 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
     //Above switch is just a placeholder to show how related data can be fetched based on table type.
 
     const Form = () => {
+        const [isDeleting, setIsDeleting] = useState(false);
+        const [deleteError, setDeleteError] = useState<string | null>(null);
 
-
-        //sumulatoion for delete correnct if any err prompt for cursor
         const handleDelete = async (e: React.FormEvent) => {
             e.preventDefault();
             if (id && deleteActionMap[table]) {
                 try {
+                    setIsDeleting(true);
+                    setDeleteError(null);
                     await deleteActionMap[table](id);
-                } catch (error) {
+                    setOpen(false);
+                    // Reload the page to refresh the list
+                    window.location.reload();
+                } catch (error: any) {
                     console.error("Error deleting:", error);
+                    setDeleteError(error.response?.data?.error || "Failed to delete");
+                }finally {
+                    setIsDeleting(false);
                 }
             }
         };
@@ -74,17 +79,36 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
             <form
                 action=""
                 className="p-4 flex flex-col gap-4"
-                onSubmit={}
+                onSubmit={handleDelete}
             >
                 <span className="text-center font-medium">
                     All data will be lost. Are you sure you want to delete this {table}?
                 </span>
-                <button className="bg-red-600 text-white py-2 px-4 rounded-md border-none w-max self-center">
-                    Delete
+                {deleteError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                        {deleteError}
+                    </div>
+                )}
+                {data && (
+                    <div className="text-sm text-gray-600 text-center">
+                        {data.firstName} {data.lastName} ({data.email})
+                    </div>
+                )}
+                <button 
+                    type="submit"
+                    disabled={isDeleting}
+                    className="bg-red-600 text-white py-2 px-4 rounded-md border-none w-max self-center disabled:bg-red-300 disabled:cursor-not-allowed"
+                >
+                    {isDeleting ? "Deleting..." : "Delete"}
                 </button>
             </form>
         ) : (type == "create" || type == "update") ? (
-            forms[table](setOpen, type, data, relatedData)
+            forms[table] ? forms[table](setOpen, type, data, relatedData) : (
+                <div className="p-4 text-center">
+                    <p className="text-gray-600">Form for "{table}" is not yet implemented.</p>
+                    <p className="text-sm text-gray-500 mt-2">Please add the form component to the forms object.</p>
+                </div>
+            )
         ) : (
             "Form not found!"
         );

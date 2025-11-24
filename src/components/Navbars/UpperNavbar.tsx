@@ -1,8 +1,11 @@
 import { Bell, CircleUserRound, Search } from 'lucide-react'
 import ThemeToggle from '../ThemeToggle'
 import MobileNavBar from './MobileNavBar'
+import { useAuth } from '@/contexts/AuthContext'
 
 const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.SetStateAction<boolean>> }) => {
+    const { user } = useAuth();
+    
     return (
         <div className="flex justify-between items-center h-14 px-5 py-3 bg-slate-200 dark:bg-gray-700">
             <h1 className="text-lg font-bold">UMMS</h1>
@@ -21,8 +24,8 @@ const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.Se
                 <div className="flex items-center justify-between border border-blue-400 gap-3 px-3 py-1 rounded-lg cursor-pointer" onClick={() => setUserDrawer(true)}>
                     <CircleUserRound className="text-blue-400" />
                     <div className="hidden md:flex flex-col">
-                        <span className="text-sm">John Doe</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-300">Admin</span>
+                        <span className="text-sm">{user?.firstName} {user?.lastName}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-300">{user?.role}</span>
                     </div>
                 </div>
 
