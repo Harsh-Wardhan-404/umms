@@ -10,6 +10,9 @@ import batchRoutes from "./routes/batchRoutes";
 import finishedGoodsRoutes from "./routes/finishedGoodsRoutes";
 import clientRoutes from "./routes/clientRoutes";
 import invoiceRoutes from "./routes/invoiceRoutes";
+import dispatchRoutes from "./routes/dispatchRoutes";
+import feedbackRoutes from "./routes/feedbackRoutes";
+import workerEfficiencyRoutes from "./routes/workerEfficiencyRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +37,9 @@ app.use("/api/batches", batchRoutes);
 app.use("/api/finished-goods", finishedGoodsRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/invoices", invoiceRoutes);
+app.use("/api/dispatches", dispatchRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/worker-efficiency", workerEfficiencyRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -64,6 +70,9 @@ app.listen(PORT, () => {
   console.log(`📦 Finished Goods API: http://localhost:${PORT}/api/finished-goods`);
   console.log(`👥 Client API: http://localhost:${PORT}/api/clients`);
   console.log(`🧾 Invoice API: http://localhost:${PORT}/api/invoices`);
+  console.log(`🚚 Dispatch API: http://localhost:${PORT}/api/dispatches`);
+  console.log(`💬 Feedback API: http://localhost:${PORT}/api/feedback`);
+  console.log(`⭐ Worker Efficiency API: http://localhost:${PORT}/api/worker-efficiency`);
 });
 
 // Graceful shutdown

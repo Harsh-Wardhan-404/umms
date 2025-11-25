@@ -4,6 +4,7 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { calculateBatchWorkersEfficiency } from "../services/efficiencyCalculator";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -371,6 +372,16 @@ router.patch("/:batchId/status", authenticateToken, requireRole(["Admin", "Super
         },
       },
     });
+
+    // If batch is completed, recalculate worker efficiency
+    if (status === "Completed") {
+      try {
+        await calculateBatchWorkersEfficiency(batchId);
+      } catch (error) {
+        console.error("Error calculating worker efficiency:", error);
+        // Don't fail the request if efficiency calculation fails
+      }
+    }
 
     res.json({
       message: "Batch status updated successfully",

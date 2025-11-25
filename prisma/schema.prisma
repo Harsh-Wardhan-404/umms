@@ -55,11 +55,13 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  createdFormulations FormulationVersion[]
-  supervisedBatches   Batch[]
-  workerEfficiency    WorkerEfficiency?
-  createdInvoices     Invoice[]
-  createdDispatches   Dispatch[]
+  createdFormulations   FormulationVersion[]
+  supervisedBatches     Batch[]
+  workerEfficiency      WorkerEfficiency?
+  createdInvoices       Invoice[]
+  createdDispatches     Dispatch[]
+  workerFeedbacks       WorkerFeedback[]     @relation("WorkerFeedbacks")
+  supervisorFeedbacks   WorkerFeedback[]     @relation("SupervisorFeedbacks")
 
   @@map("users")
 }
@@ -297,17 +299,37 @@ model Feedback {
 model WorkerEfficiency {
   id                        String   @id @default(cuid())
   userId                    String   @unique @map("user_id")
-  standardOutputQtyPerShift Float    @map("standard_output_qty_per_shift")
-  punctualityScore          Float    @map("punctuality_score")
-  efficiencyRating          Float    @map("efficiency_rating")
+  standardOutputQtyPerShift Float    @default(0) @map("standard_output_qty_per_shift")
+  punctualityScore          Float    @default(0) @map("punctuality_score")
+  efficiencyRating          Float    @default(0) @map("efficiency_rating")
   batchHistory              String[] @map("batch_history") // Array of batch IDs
+  totalBatchesCompleted     Int      @default(0) @map("total_batches_completed")
+  onTimeBatches             Int      @default(0) @map("on_time_batches")
+  feedbackTags              Json?    @map("feedback_tags") // Positive and negative feedback counts
+  lastCalculated            DateTime @default(now()) @map("last_calculated")
   createdAt                 DateTime @default(now()) @map("created_at")
   updatedAt                 DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("worker_efficiency")
+}
+
+model WorkerFeedback {
+  id          String   @id @default(cuid())
+  workerId    String   @map("worker_id")
+  batchId     String   @map("batch_id")
+  supervisorId String  @map("supervisor_id")
+  feedbackTag String   @map("feedback_tag") // "Excellent", "Good", "Needs Improvement", "Late"
+  comments    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  worker     User  @relation("WorkerFeedbacks", fields: [workerId], references: [id], onDelete: Cascade)
+  supervisor User  @relation("SupervisorFeedbacks", fields: [supervisorId], references: [id], onDelete: Cascade)
+
+  @@map("worker_feedback")
 }
 
 model ProfitLoss {
