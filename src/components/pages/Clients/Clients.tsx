@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Plus, Eye, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ const columns = [
 ];
 
 const Clients = () => {
+  const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,13 @@ const Clients = () => {
         </td>
         <td className="py-3 px-2">
           <div className="flex gap-2">
+            <Button
+              onClick={() => navigate(`/sales/clients/${client.id}`)}
+              className="flex justify-center items-center w-8 h-8 bg-blue-300 border-1 border-blue-500 !text-blue-700 hover:bg-blue-400 rounded-md cursor-pointer"
+              title="View Details"
+            >
+              <Eye size={16} />
+            </Button>
             <FormModal table="Clients" type="update" id={client.id} data={client} />
             <FormModal table="Clients" type="delete" id={client.id} data={client} />
           </div>

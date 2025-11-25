@@ -3,13 +3,14 @@ import MaterialForm from "@/components/Forms/MaterialForm";
 import FormulationForm from "@/components/Forms/FormulationForm";
 import FinishedGoodForm from "@/components/Forms/FinishedGoodForm";
 import ClientForm from "@/components/Forms/ClientForm";
+import DispatchForm from "@/components/Forms/DispatchForm";
 import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
 import api from "@/lib/api";
 
 declare interface formDataProps {
-    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices"
+    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices" | "Dispatches"
     type: "create" | "update" | "delete";
     data?: any;
     id?: string | number;
@@ -54,6 +55,11 @@ const deleteActionMap: {
         // API call to delete invoice
         const response = await api.delete(`/api/invoices/${id}`);
         return response.data;
+    },
+    Dispatches: async (id: Number | String) => {
+        // API call to delete dispatch
+        const response = await api.delete(`/api/dispatches/${id}`);
+        return response.data;
     }
 };
 
@@ -69,7 +75,8 @@ const forms: {
     RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />,
     FormulationsAndRnD: (setOpen, type, data, relatedData) => <FormulationForm setOpen={setOpen} type={type} />,
     FinishedGoods: (setOpen, type, data, relatedData) => <FinishedGoodForm setOpen={setOpen} type={type} data={data} />,
-    Clients: (setOpen, type, data, relatedData) => <ClientForm setOpen={setOpen} type={type} data={data} />
+    Clients: (setOpen, type, data, relatedData) => <ClientForm setOpen={setOpen} type={type} data={data} />,
+    Dispatches: (setOpen, type, data, relatedData) => <DispatchForm setOpen={setOpen} type={type} data={data} />
 };
 
 const FormModal = ({ table, type, data, id }: formDataProps) => {
@@ -137,6 +144,8 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                             <>Batch: {data.batchCode}</>
                         ) : data.invoiceNumber ? (
                             <>Invoice: {data.invoiceNumber}</>
+                        ) : data.awbNumber ? (
+                            <>Dispatch AWB: {data.awbNumber}</>
                         ) : data.name ? (
                             <>{data.name}</>
                         ) : null}

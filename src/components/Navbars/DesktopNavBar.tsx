@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, FileText, type LucideIcon } from "lucide-react";
+import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, FileText, Truck, TrendingUp, type LucideIcon } from "lucide-react";
 import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HomeContext } from "../HomeContext";
@@ -49,8 +49,16 @@ const menuItems: MenuSection[] = [
             { name: "Finished Goods", href: "/sales/finished-goods", icon: Package },
             { name: "Clients", href: "/sales/clients", icon: Users },
             { name: "Invoices", href: "/sales/invoices", icon: FileText },
+            { name: "Dispatches", href: "/sales/dispatches", icon: Truck },
         ],
         access: ["Admin", "Inventory Manager"]
+    },
+    {
+        name: "Performance",
+        options: [
+            { name: "Worker Efficiency", href: "/performance/workers", icon: TrendingUp },
+        ],
+        access: ["Admin", "Production Manager", "Supervisor"]
     },
     {
         name: "Administration",

@@ -19,10 +19,15 @@ import Staff from "./pages/Staff/Staff";
 import StaffDetails from "./pages/OneStaffDetail/StaffDetails";
 import FinishedGoods from "./pages/FinishedGoods/FinishedGoods";
 import Clients from "./pages/Clients/Clients";
+import ClientDetails from "./pages/Clients/ClientDetails";
 import Invoices from "./pages/Invoices/Invoices";
 import CreateInvoiceWizard from "./pages/Invoices/CreateInvoiceWizard";
 import InvoiceDetails from "./pages/Invoices/InvoiceDetails";
 import InvoicePrint from "./pages/Invoices/InvoicePrint";
+import Dispatches from "./pages/Dispatches/Dispatches";
+import DispatchDetails from "./pages/Dispatches/DispatchDetails";
+import WorkerPerformance from "./pages/WorkerPerformance/WorkerPerformance";
+import WorkerDetails from "./pages/WorkerPerformance/WorkerDetails";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
@@ -67,10 +72,15 @@ const Home = () => {
                             <Route path="/production/quality-control" element={<QualityControl />} />
                             <Route path="/sales/finished-goods" element={<FinishedGoods />} />
                             <Route path="/sales/clients" element={<Clients />} />
+                            <Route path="/sales/clients/:id" element={<ClientDetails />} />
                             <Route path="/sales/invoices" element={<Invoices />} />
                             <Route path="/sales/invoices/create" element={<CreateInvoiceWizard />} />
                             <Route path="/sales/invoices/:id" element={<InvoiceDetails />} />
                             <Route path="/sales/invoices/:id/print" element={<InvoicePrint />} />
+                            <Route path="/sales/dispatches" element={<Dispatches />} />
+                            <Route path="/sales/dispatches/:id" element={<DispatchDetails />} />
+                            <Route path="/performance/workers" element={<WorkerPerformance />} />
+                            <Route path="/performance/workers/:id" element={<WorkerDetails />} />
                             <Route path="/staff" element={<Staff />} />
                             <Route path="/user/:id" element={<StaffDetails/>} />
                         </Routes>
