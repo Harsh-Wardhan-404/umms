@@ -1,0 +1,348 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  Admin
+  InventoryManager
+  ProductionManager
+  Supervisor
+  Staff
+}
+
+
+enum StockType {
+  Raw
+  Packaging
+  Consumable
+}
+
+enum DispatchStatus {
+  Ready
+  InTransit
+  Delivered
+}
+
+enum BatchStatus {
+  Planned
+  InProgress
+  QualityCheck
+  Completed
+  Cancelled
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  createdFormulations   FormulationVersion[]
+  supervisedBatches     Batch[]
+  workerEfficiency      WorkerEfficiency?
+  createdInvoices       Invoice[]
+  createdDispatches     Dispatch[]
+  workerFeedbacks       WorkerFeedback[]     @relation("WorkerFeedbacks")
+  supervisorFeedbacks   WorkerFeedback[]     @relation("SupervisorFeedbacks")
+
+  @@map("users")
+}
+
+model Client {
+  id              String   @id @default(cuid())
+  name            String
+  email           String?  @unique
+  phone           String?
+  address         String?
+  gstNumber       String?  @map("gst_number")
+  panNumber       String?  @map("pan_number")
+  contactPerson   String?  @map("contact_person")
+  creditLimit     Float?   @default(0) @map("credit_limit")
+  paymentTerms    String?  @map("payment_terms") // Net 30, Net 60, etc.
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  invoices Invoice[]
+  feedback Feedback[]
+
+  @@map("clients")
+}
+
+model StockManagement {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  type              StockType
+  unit              String
+  currentStockQty   Float    @map("current_stock_qty")
+  minThresholdQty   Float    @map("min_threshold_qty")
+  purchaseHistory   Json[]   @map("purchase_history") // Array of purchase record objects
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  ingredients FormulationIngredient[]
+  materialsUsed BatchMaterial[]
+
+  @@map("stock_management")
+}
+
+model Formulation {
+  id          String   @id @default(cuid())
+  productName String   @unique @map("product_name")
+  versions    FormulationVersion[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("formulations")
+}
+
+model FormulationVersion {
+  id           String   @id @default(cuid())
+  formulationId String  @map("formulation_id")
+  versionNumber Int     @map("version_number")
+  isLocked     Boolean  @default(false) @map("is_locked")
+  creatorId    String   @map("creator_id")
+  creationDate DateTime @default(now()) @map("creation_date")
+  notes        String?
+  ingredients  FormulationIngredient[]
+  
+  // Relations
+  formulation   Formulation @relation(fields: [formulationId], references: [id], onDelete: Cascade)
+  creator       User        @relation(fields: [creatorId], references: [id])
+  batches       Batch[]
+  finishedGoods FinishedGood[]
+
+  @@unique([formulationId, versionNumber])
+  @@map("formulation_versions")
+}
+
+model FormulationIngredient {
+  id                    String  @id @default(cuid())
+  formulationVersionId  String  @map("formulation_version_id")
+  materialId            String  @map("material_id")
+  percentageOrComposition Float @map("percentage_or_composition")
+  unit                  String
+  notes                 String?
+  
+  // Relations
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id], onDelete: Cascade)
+  material           StockManagement    @relation(fields: [materialId], references: [id])
+
+  @@map("formulation_ingredients")
+}
+
+model Batch {
+  id                  String   @id @default(cuid())
+  batchCode           String   @unique @map("batch_code")
+  productName         String   @map("product_name")
+  formulationVersionId String  @map("formulation_version_id")
+  batchSize           Float    @map("batch_size")
+  supervisorId        String   @map("supervisor_id")
+  workers             String[] // Array of worker user IDs
+  shift               String   @map("shift") // "Morning", "Evening", "Night"
+  startTime           DateTime @map("start_time")
+  endTime             DateTime? @map("end_time")
+  status              BatchStatus @default(InProgress)
+  rawMaterialsUsed    Json[]   @map("raw_materials_used") // Array of material usage objects
+  qrCodeData          String   @map("qr_code_data")
+  photos              Json[]   // Array of photo objects with before/after packaging
+  productionNotes     String?  @map("production_notes")
+  qualityChecks       Json[]   @map("quality_checks") // Array of quality check records
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id], onDelete: Cascade)
+  supervisor         User               @relation(fields: [supervisorId], references: [id])
+  finishedGood       FinishedGood?
+  materialsUsed      BatchMaterial[]
+
+  @@map("batches")
+}
+
+model BatchMaterial {
+  id           String @id @default(cuid())
+  batchId      String @map("batch_id")
+  materialId   String @map("material_id")
+  quantityUsed Float @map("quantity_used")
+  
+  // Relations
+  batch   Batch          @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  material StockManagement @relation(fields: [materialId], references: [id])
+
+  @@map("batch_materials")
+}
+
+model FinishedGood {
+  id                   String   @id @default(cuid())
+  batchId              String   @unique @map("batch_id")
+  productName          String   @map("product_name")
+  formulationVersionId String   @map("formulation_version_id")
+  quantityProduced     Float    @map("quantity_produced")
+  availableQuantity    Float    @map("available_quantity") // Quantity available for sale
+  unitPrice            Float    @map("unit_price") // Price per unit
+  hsnCode              String   @map("hsn_code") // HSN code for GST
+  qualityStatus        String   @default("Approved") @map("quality_status") // Approved, Pending, Rejected
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  batch              Batch              @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  formulationVersion FormulationVersion @relation(fields: [formulationVersionId], references: [id])
+  invoiceItems       InvoiceItem[]
+
+  @@map("finished_goods")
+}
+
+model Invoice {
+  id              String   @id @default(cuid())
+  invoiceNumber   String   @unique @map("invoice_number")
+  clientId        String   @map("client_id")
+  creatorId       String   @map("creator_id")
+  invoiceDate     DateTime @map("invoice_date")
+  dueDate         DateTime @map("due_date")
+  items           Json[]   // Array of invoice item objects
+  subtotal        Float
+  taxDetails      Json     @map("tax_details") // Tax breakdown object
+  totalAmount     Float    @map("total_amount")
+  invoicePdfUrl   String?  @map("invoice_pdf_url")
+  paymentStatus   String   @default("Pending") @map("payment_status") // Pending, Partial, Paid
+  notes           String?  // Additional notes
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  invoiceItems InvoiceItem[]
+  dispatch     Dispatch?
+  creator      User       @relation(fields: [creatorId], references: [id])
+  client       Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id            String @id @default(cuid())
+  invoiceId     String @map("invoice_id")
+  finishedGoodId String @map("finished_good_id")
+  batchCode     String @map("batch_code")
+  quantity      Float
+  hsnCode       String @map("hsn_code")
+  pricePerUnit  Float  @map("price_per_unit")
+  
+  // Relations
+  invoice      Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  finishedGood FinishedGood @relation(fields: [finishedGoodId], references: [id])
+
+  @@map("invoice_items")
+}
+
+model Dispatch {
+  id          String         @id @default(cuid())
+  invoiceId   String         @unique @map("invoice_id")
+  courierName String         @map("courier_name")
+  awbNumber   String         @map("awb_number")
+  dispatchDate DateTime      @map("dispatch_date")
+  status      DispatchStatus
+  creatorId   String         @map("creator_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  feedback  Feedback?
+  creator   User      @relation(fields: [creatorId], references: [id])
+
+  @@map("dispatches")
+}
+
+model Feedback {
+  id             String   @id @default(cuid())
+  dispatchId     String   @unique @map("dispatch_id")
+  clientId       String   @map("client_id")
+  productId      String   @map("product_id")
+  ratingQuality  Int      @map("rating_quality")
+  ratingPackaging Int     @map("rating_packaging")
+  ratingDelivery Int      @map("rating_delivery")
+  clientRemarks  String?  @map("client_remarks")
+  issueTags      String[] @map("issue_tags")
+  feedbackDate   DateTime @default(now()) @map("feedback_date")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  dispatch Dispatch @relation(fields: [dispatchId], references: [id], onDelete: Cascade)
+  client   Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("feedback")
+}
+
+model WorkerEfficiency {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique @map("user_id")
+  standardOutputQtyPerShift Float    @default(0) @map("standard_output_qty_per_shift")
+  punctualityScore          Float    @default(0) @map("punctuality_score")
+  efficiencyRating          Float    @default(0) @map("efficiency_rating")
+  batchHistory              String[] @map("batch_history") // Array of batch IDs
+  totalBatchesCompleted     Int      @default(0) @map("total_batches_completed")
+  onTimeBatches             Int      @default(0) @map("on_time_batches")
+  feedbackTags              Json?    @map("feedback_tags") // Positive and negative feedback counts
+  lastCalculated            DateTime @default(now()) @map("last_calculated")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("worker_efficiency")
+}
+
+model WorkerFeedback {
+  id          String   @id @default(cuid())
+  workerId    String   @map("worker_id")
+  batchId     String   @map("batch_id")
+  supervisorId String  @map("supervisor_id")
+  feedbackTag String   @map("feedback_tag") // "Excellent", "Good", "Needs Improvement", "Late"
+  comments    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  worker     User  @relation("WorkerFeedbacks", fields: [workerId], references: [id], onDelete: Cascade)
+  supervisor User  @relation("SupervisorFeedbacks", fields: [supervisorId], references: [id], onDelete: Cascade)
+
+  @@map("worker_feedback")
+}
+
+model ProfitLoss {
+  id               String   @id @default(cuid())
+  month            DateTime
+  fixedExpenses    Json     @map("fixed_expenses") // Object with rent, power, salary
+  variableExpenses Json     @map("variable_expenses") // Object with material wastage, etc.
+  totalSalesValue  Float    @map("total_sales_value")
+  grossProfit      Float    @map("gross_profit")
+  netProfit        Float    @map("net_profit")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([month])
+  @@map("profit_loss")
+}

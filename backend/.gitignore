@@ -1,0 +1,7 @@
+.env
+node_modules/
+dist/
+/src/generated/prisma
+.DS_Store
+*.DS_Store
+uploads/
