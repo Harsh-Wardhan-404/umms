@@ -237,12 +237,41 @@ export interface WorkerEfficiency {
 
 export interface ProfitLoss {
   id: string;
-  month: Date;
-  fixedExpenses: any;
-  variableExpenses: any;
+  month: Date | string;
+  fixedExpenses: {
+    rent: number;
+    power: number;
+    salaries: number;
+    other?: number;
+  };
+  variableExpenses: {
+    materialWastage: number;
+    other?: number;
+  };
   totalSalesValue: number;
   grossProfit: number;
   netProfit: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface PLComparisonData {
+  period: string; // "Jan 2024", "Q1 2024", "2024"
+  sales: number;
+  fixedExpenses: number;
+  variableExpenses: number;
+  grossProfit: number;
+  netProfit: number;
+  profitMargin: number;
+}
+
+export interface PLSummaryStats {
+  currentMonthNetProfit: number;
+  previousMonthNetProfit: number;
+  growthPercentage: number;
+  averageProfitMargin: number;
+  bestMonth: string;
+  worstMonth: string;
+  totalSalesYTD: number;
+  totalProfitYTD: number;
 }

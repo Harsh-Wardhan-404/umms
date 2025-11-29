@@ -28,6 +28,9 @@ import Dispatches from "./pages/Dispatches/Dispatches";
 import DispatchDetails from "./pages/Dispatches/DispatchDetails";
 import WorkerPerformance from "./pages/WorkerPerformance/WorkerPerformance";
 import WorkerDetails from "./pages/WorkerPerformance/WorkerDetails";
+import ProfitLossDashboard from "./pages/ProfitLoss/ProfitLossDashboard";
+import ProfitLossForm from "./pages/ProfitLoss/ProfitLossForm";
+import ProfitLossAnalytics from "./pages/ProfitLoss/ProfitLossAnalytics";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
@@ -81,6 +84,10 @@ const Home = () => {
                             <Route path="/sales/dispatches/:id" element={<DispatchDetails />} />
                             <Route path="/performance/workers" element={<WorkerPerformance />} />
                             <Route path="/performance/workers/:id" element={<WorkerDetails />} />
+                            <Route path="/finance/profit-loss" element={<ProfitLossDashboard />} />
+                            <Route path="/finance/profit-loss/new" element={<ProfitLossForm />} />
+                            <Route path="/finance/profit-loss/edit/:id" element={<ProfitLossForm />} />
+                            <Route path="/finance/profit-loss/analytics" element={<ProfitLossAnalytics />} />
                             <Route path="/staff" element={<Staff />} />
                             <Route path="/user/:id" element={<StaffDetails/>} />
                         </Routes>

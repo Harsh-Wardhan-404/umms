@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, FileText, Truck, TrendingUp, type LucideIcon } from "lucide-react";
+import { Box, ChartBar, CheckCircle, ClipboardList, Cog, Factory, LayoutDashboard, Package, ShoppingCart, User, Users, FileText, Truck, TrendingUp, BarChart3, type LucideIcon } from "lucide-react";
 import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HomeContext } from "../HomeContext";
@@ -59,6 +59,14 @@ const menuItems: MenuSection[] = [
             { name: "Worker Efficiency", href: "/performance/workers", icon: TrendingUp },
         ],
         access: ["Admin", "Production Manager", "Supervisor"]
+    },
+    {
+        name: "Finance",
+        options: [
+            { name: "Profit & Loss", href: "/finance/profit-loss", icon: TrendingUp },
+            { name: "Analytics", href: "/finance/profit-loss/analytics", icon: BarChart3 },
+        ],
+        access: ["Admin", "ProductionManager"]
     },
     {
         name: "Administration",

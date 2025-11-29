@@ -10,7 +10,7 @@ import Staff from "../Staff/Staff";
 import api from "@/lib/api";
 
 declare interface formDataProps {
-    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices" | "Dispatches"
+    table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices" | "Dispatches" | "Profit & Loss Entry"
     type: "create" | "update" | "delete";
     data?: any;
     id?: string | number;
@@ -59,6 +59,11 @@ const deleteActionMap: {
     Dispatches: async (id: Number | String) => {
         // API call to delete dispatch
         const response = await api.delete(`/api/dispatches/${id}`);
+        return response.data;
+    },
+    "Profit & Loss Entry": async (id: Number | String) => {
+        // API call to delete P&L entry
+        const response = await api.delete(`/api/profit-loss/${id}`);
         return response.data;
     }
 };
