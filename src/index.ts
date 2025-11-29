@@ -13,6 +13,7 @@ import invoiceRoutes from "./routes/invoiceRoutes";
 import dispatchRoutes from "./routes/dispatchRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
 import workerEfficiencyRoutes from "./routes/workerEfficiencyRoutes";
+import profitLossRoutes from "./routes/profitLossRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.use("/api/invoices", invoiceRoutes);
 app.use("/api/dispatches", dispatchRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/worker-efficiency", workerEfficiencyRoutes);
+app.use("/api/profit-loss", profitLossRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -73,6 +75,7 @@ app.listen(PORT, () => {
   console.log(`🚚 Dispatch API: http://localhost:${PORT}/api/dispatches`);
   console.log(`💬 Feedback API: http://localhost:${PORT}/api/feedback`);
   console.log(`⭐ Worker Efficiency API: http://localhost:${PORT}/api/worker-efficiency`);
+  console.log(`💰 Profit & Loss API: http://localhost:${PORT}/api/profit-loss`);
 });
 
 // Graceful shutdown
