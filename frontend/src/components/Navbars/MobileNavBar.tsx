@@ -20,7 +20,7 @@ const menuItems: MenuSection[] = [
         name: "Inventory & Management",
         options: [
             { name: "Raw Materials", href: "/inventory/raw-materials", icon: Box },
-            { name: "Suppliers", href: "/inventory/suppliers", icon: Package },
+            // { name: "Suppliers", href: "/inventory/suppliers", icon: Package }, // Hidden - empty page
         ],
         access: ["Admin", "Inventory Manager"]
     },
@@ -29,7 +29,7 @@ const menuItems: MenuSection[] = [
         options: [
             { name: "Formulations & R&D", href: "/production/formulations-and-rd", icon: Factory },
             { name: "Batch Production", href: "/production/batch-production", icon: ClipboardList },
-            { name: "Quality Control", href: "/production/quality-control", icon: CheckCircle },
+            // { name: "Quality Control", href: "/production/quality-control", icon: CheckCircle }, // Hidden - empty page
         ],
         access: ["Admin", "Production Manager"]
     },

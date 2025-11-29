@@ -2,10 +2,6 @@ import { RefreshCcw } from "lucide-react"
 import { Button } from "../../ui/button"
 import CriticalAlerts from "../_Components/CriticalAlerts"
 import KeyPerformanceIndicators from "./_Components/KeyPerformanceIndicators"
-import ExpenseChart from "../_Components/ExpenseChart"
-import ProductionStatusGraph from "../_Components/ProductionStatusGraph"
-import QualityMetricsGraph from "../_Components/QualityMetricsGraph"
-import InventoryLevelCategoryGraph from "../_Components/InventoryLevelCategoryGraph"
 
 const AdminDashboard = () => {
     return (
@@ -18,8 +14,12 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-3 text-black dark:text-white">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Last updated: 2 days ago</p>
-                    <Button className="group cursor-pointer">Refresh <RefreshCcw className="size-4 group-hover:rotate-[-45deg] transition-transform" /></Button>
+                    <Button 
+                        className="group cursor-pointer"
+                        onClick={() => window.location.reload()}
+                    >
+                        Refresh <RefreshCcw className="size-4 group-hover:rotate-[-45deg] transition-transform" />
+                    </Button>
                 </div>
             </div>
 
@@ -30,19 +30,6 @@ const AdminDashboard = () => {
 
             {/* Key Performance Indicators */}
             <KeyPerformanceIndicators />
-
-            {/* Graphical Representations */}
-            <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex flex-col w-full lg:w-1/2 h-[800px] gap-4">
-                    <ExpenseChart />
-                    <ProductionStatusGraph />
-                </div>
-
-                <div className="flex flex-col w-full lg:w-1/2 h-[800px] gap-4">
-                    <QualityMetricsGraph/>
-                    <InventoryLevelCategoryGraph/>
-                </div>
-            </div>
         </div>
     )
 }
