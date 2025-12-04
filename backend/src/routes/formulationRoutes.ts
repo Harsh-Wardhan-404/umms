@@ -666,4 +666,63 @@ router.put("/:formulationId/versions/:versionNumber/ingredients", authenticateTo
   }
 });
 
+// 10. Delete formulation
+router.delete("/:formulationId", authenticateToken, requireManager, async (req, res) => {
+  try {
+    const { formulationId } = req.params;
+
+    // Check if formulation exists
+    const formulation = await prisma.formulation.findUnique({
+      where: { id: formulationId },
+      include: {
+        versions: {
+          include: {
+            batches: true,
+            finishedGoods: true,
+          },
+        },
+      },
+    });
+
+    if (!formulation) {
+      return res.status(404).json({
+        error: "Formulation not found"
+      });
+    }
+
+    // Check if formulation is used in batches
+    const hasBatches = formulation.versions.some(v => v.batches.length > 0);
+    if (hasBatches) {
+      return res.status(400).json({
+        error: "Cannot delete formulation that is used in batches",
+        details: "This formulation has been used in production batches"
+      });
+    }
+
+    // Check if formulation is used in finished goods
+    const hasFinishedGoods = formulation.versions.some(v => v.finishedGoods.length > 0);
+    if (hasFinishedGoods) {
+      return res.status(400).json({
+        error: "Cannot delete formulation that is used in finished goods",
+        details: "This formulation has been used in finished goods"
+      });
+    }
+
+    // Delete the formulation (cascade will delete versions and ingredients)
+    await prisma.formulation.delete({
+      where: { id: formulationId },
+    });
+
+    res.json({
+      message: "Formulation deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting formulation:", error);
+    res.status(500).json({
+      error: "Failed to delete formulation",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
 export default router;

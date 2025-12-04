@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { PrismaClient } from "../generated/prisma";
+import { authenticateToken, requireRole } from "../middleware/auth";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -382,6 +383,59 @@ router.get("/alerts/low-stock", async (req, res) => {
     console.error("Error fetching low stock alerts:", error);
     res.status(500).json({
       error: "Failed to fetch low stock alerts",
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+
+// 8. Delete material
+router.delete("/materials/:materialId", authenticateToken, requireRole(["Admin", "InventoryManager"]), async (req, res) => {
+  try {
+    const { materialId } = req.params;
+
+    // Check if material exists
+    const material = await prisma.stockManagement.findUnique({
+      where: { id: materialId },
+      include: {
+        ingredients: true,
+        materialsUsed: true,
+      },
+    });
+
+    if (!material) {
+      return res.status(404).json({
+        error: "Material not found",
+      });
+    }
+
+    // Check if material is used in formulations
+    if (material.ingredients.length > 0) {
+      return res.status(400).json({
+        error: "Cannot delete material that is used in formulations",
+        details: `This material is used in ${material.ingredients.length} formulation(s)`,
+      });
+    }
+
+    // Check if material is used in batches
+    if (material.materialsUsed.length > 0) {
+      return res.status(400).json({
+        error: "Cannot delete material that has been used in batches",
+        details: `This material has been used in ${material.materialsUsed.length} batch(es)`,
+      });
+    }
+
+    // Delete the material
+    await prisma.stockManagement.delete({
+      where: { id: materialId },
+    });
+
+    res.json({
+      message: "Material deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting material:", error);
+    res.status(500).json({
+      error: "Failed to delete material",
       details: error instanceof Error ? error.message : "Unknown error",
     });
   }

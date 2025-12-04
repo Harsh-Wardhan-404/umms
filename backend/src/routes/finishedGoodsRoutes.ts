@@ -296,4 +296,43 @@ router.get("/batch/:batchId", authenticateToken, async (req: Request, res: Respo
   }
 });
 
+// 7. Delete finished goods
+router.delete("/:id", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Check if finished goods exists
+    const finishedGood = await prisma.finishedGood.findUnique({
+      where: { id },
+      include: {
+        invoiceItems: true,
+      },
+    });
+
+    if (!finishedGood) {
+      return res.status(404).json({ error: "Finished goods not found" });
+    }
+
+    // Check if finished goods is used in invoices
+    if (finishedGood.invoiceItems.length > 0) {
+      return res.status(400).json({
+        error: "Cannot delete finished goods that is used in invoices",
+        details: `This finished good is referenced in ${finishedGood.invoiceItems.length} invoice(s)`
+      });
+    }
+
+    // Delete the finished goods
+    await prisma.finishedGood.delete({
+      where: { id },
+    });
+
+    res.json({
+      message: "Finished goods deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting finished goods:", error);
+    res.status(500).json({ error: "Failed to delete finished goods" });
+  }
+});
+
 export default router;

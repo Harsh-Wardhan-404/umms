@@ -8,6 +8,7 @@ import { Plus, SquarePen, Trash2, X } from "lucide-react";
 import { useState, type JSX } from "react";
 import Staff from "../Staff/Staff";
 import api from "@/lib/api";
+import { toast } from "react-hot-toast";
 
 declare interface formDataProps {
     table:  "RawMaterial" | "Suppliers" | "FormulationsAndRnD" | "BatchProduction" | "Staff" | "FinishedGoods" | "Clients" | "Invoices" | "Dispatches" | "Profit & Loss Entry"
@@ -104,22 +105,29 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
 
     const Form = () => {
         const [isDeleting, setIsDeleting] = useState(false);
-        const [deleteError, setDeleteError] = useState<string | null>(null);
 
         const handleDelete = async (e: React.FormEvent) => {
             e.preventDefault();
             if (id && deleteActionMap[table]) {
                 try {
                     setIsDeleting(true);
-                    setDeleteError(null);
                     await deleteActionMap[table](id);
                     setOpen(false);
+                    toast.success(`${table} deleted successfully`);
                     // Reload the page to refresh the list
                     window.location.reload();
                 } catch (error: any) {
                     console.error("Error deleting:", error);
-                    setDeleteError(error.response?.data?.error || "Failed to delete");
-                }finally {
+                    const errorMessage = error.response?.data?.error || "Failed to delete";
+                    const errorDetails = error.response?.data?.details;
+                    
+                    // Show error in toast and close modal
+                    const fullErrorMessage = errorDetails 
+                        ? `${errorMessage}: ${errorDetails}` 
+                        : errorMessage;
+                    toast.error(fullErrorMessage);
+                    setOpen(false);
+                } finally {
                     setIsDeleting(false);
                 }
             }
@@ -134,11 +142,6 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                 <span className="text-center font-medium">
                     All data will be lost. Are you sure you want to delete this {table}?
                 </span>
-                {deleteError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
-                        {deleteError}
-                    </div>
-                )}
                 {data && (
                     <div className="text-sm text-gray-600 text-center">
                         {data.firstName && data.lastName ? (
@@ -159,7 +162,7 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                 <button 
                     type="submit"
                     disabled={isDeleting}
-                    className="bg-red-600 text-white py-2 px-4 rounded-md border-none w-max self-center disabled:bg-red-300 disabled:cursor-not-allowed"
+                    className="bg-red-600 text-white py-2 px-4 rounded-md border-none w-max self-center cursor-pointer disabled:bg-red-300 disabled:cursor-not-allowed"
                 >
                     {isDeleting ? "Deleting..." : "Delete"}
                 </button>

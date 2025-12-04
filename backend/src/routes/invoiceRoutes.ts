@@ -447,4 +447,60 @@ router.get("/stats/overview", authenticateToken, async (req: Request, res: Respo
   }
 });
 
+// 7. Delete invoice
+router.delete("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Check if invoice exists
+    const invoice = await prisma.invoice.findUnique({
+      where: { id },
+      include: {
+        dispatch: true,
+        invoiceItems: {
+          include: {
+            finishedGood: true,
+          },
+        },
+      },
+    });
+
+    if (!invoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    // Check if invoice has dispatch
+    if (invoice.dispatch) {
+      return res.status(400).json({
+        error: "Cannot delete invoice that has dispatch",
+        details: "Please delete the associated dispatch first"
+      });
+    }
+
+    // Restore finished goods quantities before deleting
+    for (const item of invoice.invoiceItems) {
+      await prisma.finishedGood.update({
+        where: { id: item.finishedGoodId },
+        data: {
+          availableQuantity: {
+            increment: item.quantity,
+          },
+        },
+      });
+    }
+
+    // Delete the invoice (cascade will delete invoice items)
+    await prisma.invoice.delete({
+      where: { id },
+    });
+
+    res.json({
+      message: "Invoice deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    res.status(500).json({ error: "Failed to delete invoice" });
+  }
+});
+
 export default router;

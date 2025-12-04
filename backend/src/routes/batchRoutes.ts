@@ -621,4 +621,51 @@ router.get("/stats/overview", authenticateToken, async (req: Request, res: Respo
   }
 });
 
+// Delete batch
+router.delete("/:batchId", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+  try {
+    const { batchId } = req.params;
+
+    // Check if batch exists
+    const batch = await prisma.batch.findUnique({
+      where: { id: batchId },
+      include: {
+        finishedGood: true,
+      },
+    });
+
+    if (!batch) {
+      return res.status(404).json({ error: "Batch not found" });
+    }
+
+    // Check if batch has finished goods
+    if (batch.finishedGood) {
+      return res.status(400).json({
+        error: "Cannot delete batch that has finished goods",
+        details: "Please delete the associated finished goods first"
+      });
+    }
+
+    // Only allow deletion of Planned or Cancelled batches
+    if (batch.status !== "Planned" && batch.status !== "Cancelled") {
+      return res.status(400).json({
+        error: "Cannot delete batch in this status",
+        details: `Only Planned or Cancelled batches can be deleted. Current status: ${batch.status}`
+      });
+    }
+
+    // Delete the batch (cascade will delete batch materials)
+    await prisma.batch.delete({
+      where: { id: batchId },
+    });
+
+    res.json({
+      message: "Batch deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting batch:", error);
+    res.status(500).json({ error: "Failed to delete batch" });
+  }
+});
+
 export default router;
