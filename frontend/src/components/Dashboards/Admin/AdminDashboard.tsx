@@ -2,6 +2,7 @@ import { RefreshCcw } from "lucide-react"
 import { Button } from "../../ui/button"
 import CriticalAlerts from "../_Components/CriticalAlerts"
 import KeyPerformanceIndicators from "./_Components/KeyPerformanceIndicators"
+import ActivityLogs from "./_Components/ActivityLogs"
 
 const AdminDashboard = () => {
     return (
@@ -30,6 +31,9 @@ const AdminDashboard = () => {
 
             {/* Key Performance Indicators */}
             <KeyPerformanceIndicators />
+
+            {/* Recent Activity Logs */}
+            <ActivityLogs />
         </div>
     )
 }

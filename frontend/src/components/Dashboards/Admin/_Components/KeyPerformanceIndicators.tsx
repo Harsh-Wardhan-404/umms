@@ -46,7 +46,7 @@ const KeyPerformanceIndicators = () => {
           api.get("/api/stock/alerts/low-stock"),
           api.get("/api/batch/stats/overview"),
           api.get("/api/formulation"),
-          api.get("/api/user"),
+          api.get("/api/users"),
           api.get("/api/profit-loss/analytics/summary"),
         ])
 
@@ -62,31 +62,49 @@ const KeyPerformanceIndicators = () => {
         // Raw Materials count
         if (stockRes.status === 'fulfilled') {
           data.rawMaterials = stockRes.value.data.materials?.length || 0
+        } else {
+          console.error("Failed to fetch raw materials:", stockRes.reason?.response?.data || stockRes.reason?.message)
         }
 
         // Low Stock Alerts
         if (lowStockRes.status === 'fulfilled') {
           data.lowStockAlerts = lowStockRes.value.data.totalAlerts || 0
+        } else {
+          console.error("Failed to fetch low stock alerts:", lowStockRes.reason?.response?.data || lowStockRes.reason?.message)
         }
 
         // Active Batches (InProgress status)
         if (batchStatsRes.status === 'fulfilled') {
           data.activeBatches = batchStatsRes.value.data.stats?.inProgressBatches || 0
+        } else {
+          console.error("Failed to fetch batch stats:", batchStatsRes.reason?.response?.data || batchStatsRes.reason?.message)
         }
 
         // Formulations count
         if (formulationsRes.status === 'fulfilled') {
           data.formulations = formulationsRes.value.data.totalCount || 0
+        } else {
+          console.error("Failed to fetch formulations:", formulationsRes.reason?.response?.data || formulationsRes.reason?.message)
         }
 
         // System Users count
         if (usersRes.status === 'fulfilled') {
           data.systemUsers = usersRes.value.data.pagination?.total || usersRes.value.data.users?.length || 0
+        } else {
+          const error = usersRes.reason?.response?.data || usersRes.reason?.message || usersRes.reason
+          console.error("Failed to fetch users:", error)
+          console.error("Users API error details:", {
+            status: usersRes.reason?.response?.status,
+            statusText: usersRes.reason?.response?.statusText,
+            data: usersRes.reason?.response?.data
+          })
         }
 
         // Profit Margin from P&L summary
         if (profitLossRes.status === 'fulfilled') {
           data.profitMargin = profitLossRes.value.data.averageProfitMargin || 0
+        } else {
+          console.error("Failed to fetch profit/loss:", profitLossRes.reason?.response?.data || profitLossRes.reason?.message)
         }
 
         setKpiData(data)
