@@ -51,8 +51,8 @@ const UserForm = ({
         handleSubmit,
         formState: { errors },
         watch,
-    } = useForm<userSchema>({
-        resolver: zodResolver(type === "create" ? CreateUserSchema : UpdateUserSchema),
+    } = useForm({
+        resolver: zodResolver(type === "create" ? CreateUserSchema : UpdateUserSchema) as any,
         defaultValues: {
             username: data?.username || "",
             email: data?.email || "",
@@ -139,8 +139,9 @@ const UserForm = ({
                 };
                 
                 // Only include password if it's provided
-                if (dataFromForm.password) {
-                    updateData.password = dataFromForm.password;
+                const formData = dataFromForm as any;
+                if (formData.password) {
+                    updateData.password = formData.password;
                 }
                 
                 const response = await api.put(`/api/users/${data?.id}`, updateData);
@@ -179,7 +180,7 @@ const UserForm = ({
                         register={register}
                         name="username"
                         defaultValue={data?.username}
-                        err={errors.username}
+                        err={errors.username as any}
                     />
                     {usernameCheckLoading && (
                         <p className="text-xs text-blue-500">Checking availability...</p>
@@ -196,14 +197,14 @@ const UserForm = ({
                     register={register}
                     name="email"
                     defaultValue={data?.email}
-                    err={errors.email}
+                        err={errors.email as any}
                 />
                 <div className="flex flex-col gap-2 w-full md:w-[30%]">
                     <InputField
                         label={type === "update" ? "Password (leave blank to keep current)" : "Password"}
                         register={register}
                         name="password"
-                        err={errors.password}
+                        err={(errors as any).password}
                         type="password"
                     />
                     {type === "create" && (
@@ -218,13 +219,13 @@ const UserForm = ({
                 <div className='flex flex-col flex-1'>
                     <label htmlFor="firstName" className='text-xs text-gray-400'>First Name</label>
                     <input {...register('firstName')} className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" />
-                    {errors.firstName?.message && <p className='text-red-500'>{errors.firstName?.message}</p>}
+                    {errors.firstName?.message && <p className='text-red-500'>{String(errors.firstName?.message)}</p>}
                 </div>
 
                 <div className='flex flex-col flex-1'>
                     <label htmlFor="lastName" className='text-xs text-gray-400'>Last Name</label>
                     <input {...register('lastName')} className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" />
-                    {errors.lastName?.message && <p className='text-red-500'>{errors.lastName?.message}</p>}
+                    {errors.lastName?.message && <p className='text-red-500'>{String(errors.lastName?.message)}</p>}
                 </div>
             </div>
             <div className="flex flex-col gap-2 w-full md:w-1/4">

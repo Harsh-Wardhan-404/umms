@@ -92,7 +92,7 @@ const FormulationsAndRnD = () => {
           <div className="flex items-center gap-2">
             {item.productName}
             {hasLockedVersion && (
-              <Lock size={14} className="text-green-600" title="Has locked version" />
+              <Lock size={14} className="text-green-600" />
             )}
           </div>
         </td>

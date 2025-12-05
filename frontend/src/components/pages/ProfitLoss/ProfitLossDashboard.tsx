@@ -440,7 +440,8 @@ const ProfitLossDashboard: React.FC = () => {
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, id: "", name: "" })}
         title="Delete P&L Entry"
-        type="Profit & Loss Entry"
+        table="Profit & Loss Entry"
+        type="delete"
         id={deleteModal.id}
         name={deleteModal.name}
         onSuccess={() => {
@@ -495,12 +496,12 @@ const ProfitLossDashboard: React.FC = () => {
                         )}
                       </span>
                     </div>
-                    {detailsModal.record.fixedExpenses.other > 0 && (
+                    {(detailsModal.record.fixedExpenses.other || 0) > 0 && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Other</span>
                         <span className="font-medium">
                           {formatCurrency(
-                            detailsModal.record.fixedExpenses.other
+                            detailsModal.record.fixedExpenses.other || 0
                           )}
                         </span>
                       </div>
@@ -533,12 +534,12 @@ const ProfitLossDashboard: React.FC = () => {
                         )}
                       </span>
                     </div>
-                    {detailsModal.record.variableExpenses.other > 0 && (
+                    {(detailsModal.record.variableExpenses.other || 0) > 0 && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Other</span>
                         <span className="font-medium">
                           {formatCurrency(
-                            detailsModal.record.variableExpenses.other
+                            detailsModal.record.variableExpenses.other || 0
                           )}
                         </span>
                       </div>
@@ -633,11 +634,11 @@ const ProfitLossDashboard: React.FC = () => {
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
-                {isAdmin && (
+                {isAdmin && detailsModal.record && (
                   <button
                     onClick={() => {
                       navigate(
-                        `/finance/profit-loss/edit/${detailsModal.record.id}`
+                        `/finance/profit-loss/edit/${detailsModal.record!.id}`
                       );
                     }}
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"

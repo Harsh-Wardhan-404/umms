@@ -185,7 +185,7 @@ const FinishedGoods = () => {
             <RefreshCw size={16} />
             Refresh
           </button>
-          <FormModal table="FinishedGoods" type="create" setOpen={setShowCreateModal} />
+          <FormModal table="FinishedGoods" type="create" />
         </div>
       </div>
 

@@ -16,6 +16,11 @@ declare interface formDataProps {
     data?: any;
     id?: string | number;
     relatedData?: any;
+    title?: string;
+    name?: string;
+    onClose?: () => void;
+    onSuccess?: () => void;
+    isOpen?: boolean;
 }
 
 // Delete action map for different tables
@@ -77,12 +82,12 @@ const forms: {
     relatedData?: any
   ) => JSX.Element;
 } = {
-    Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type} data={data} relatedData={relatedData} />,
-    RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type} data={data} />,
-    FormulationsAndRnD: (setOpen, type, data, relatedData) => <FormulationForm setOpen={setOpen} type={type} />,
-    FinishedGoods: (setOpen, type, data, relatedData) => <FinishedGoodForm setOpen={setOpen} type={type} data={data} />,
-    Clients: (setOpen, type, data, relatedData) => <ClientForm setOpen={setOpen} type={type} data={data} />,
-    Dispatches: (setOpen, type, data, relatedData) => <DispatchForm setOpen={setOpen} type={type} data={data} />
+    Staff: (setOpen, type, data, relatedData) => <UserForm setOpen={setOpen} type={type as "create" | "update"} data={data} relatedData={relatedData} />,
+    RawMaterial: (setOpen, type, data, relatedData) => <MaterialForm setOpen={setOpen} type={type as "create" | "update"} data={data} />,
+    FormulationsAndRnD: (setOpen, type, data, relatedData) => type === "create" ? <FormulationForm setOpen={setOpen} type="create" /> : <div className="p-4 text-center"><p className="text-gray-600">Update not implemented for formulations</p></div>,
+    FinishedGoods: (setOpen, type, data, relatedData) => <FinishedGoodForm setOpen={setOpen} type={type as "create" | "update"} data={data} />,
+    Clients: (setOpen, type, data, relatedData) => <ClientForm setOpen={setOpen} type={type as "create" | "update"} data={data} />,
+    Dispatches: (setOpen, type, data, relatedData) => <DispatchForm setOpen={setOpen} type={type as "create" | "update"} data={data} />
 };
 
 const FormModal = ({ table, type, data, id }: formDataProps) => {
@@ -168,7 +173,7 @@ const FormModal = ({ table, type, data, id }: formDataProps) => {
                 </button>
             </form>
         ) : (type == "create" || type == "update") ? (
-            forms[table] ? forms[table](setOpen, type, data, relatedData) : (
+            forms[table] ? forms[table](setOpen, type as "create" | "update", data, relatedData) : (
                 <div className="p-4 text-center">
                     <p className="text-gray-600">Form for "{table}" is not yet implemented.</p>
                     <p className="text-sm text-gray-500 mt-2">Please add the form component to the forms object.</p>

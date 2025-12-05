@@ -203,9 +203,12 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({
     }
   };
 
+  const chart = renderChart();
+  if (!chart) return null;
+
   return (
     <ResponsiveContainer width="100%" height={height}>
-      {renderChart()}
+      {chart}
     </ResponsiveContainer>
   );
 };

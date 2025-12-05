@@ -68,6 +68,8 @@ umms/
    ```
 
 5. **Run the application**
+
+   **Development Mode** (separate servers):
    ```bash
    # From the root directory
    npm run dev          # Run both frontend and backend
@@ -84,6 +86,20 @@ umms/
    cd frontend
    npm run dev
    ```
+
+   **Production Mode** (single server):
+   ```bash
+   # Build the frontend
+   cd frontend
+   npm run build
+
+   # Start the backend (will serve frontend automatically)
+   cd ../backend
+   npm run start
+   ```
+   
+   The backend will automatically serve the frontend from `frontend/dist/` if it exists.
+   Access the application at `http://localhost:3000`
 
 ## 📚 Documentation
 

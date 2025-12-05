@@ -170,9 +170,9 @@ const Details = () => {
                             <br />
                             <h1 className='text-sm sm:text-xl font-bold'>Role: {data.role}</h1>
                             <br />
-                            <h1 className='text-sm sm:text-xl font-bold'>Joining: {new Date(data.createdAt).toLocaleDateString()}</h1>
+                            <h1 className='text-sm sm:text-xl font-bold'>Joining: {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'N/A'}</h1>
                             <br />
-                            <h1 className='text-sm sm:text-xl font-bold'>ID: {data.id.substring(0, 12)}...</h1>
+                            <h1 className='text-sm sm:text-xl font-bold'>ID: {data.id ? data.id.substring(0, 12) + '...' : 'N/A'}</h1>
                         </div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@ const Details = () => {
                             <h2 className='font-semibold text-3xl mt-2'>{data.workerEfficiency?.efficiencyRating ?? 'N/A'}</h2>
                         </div>
 
-                        {(data.role === "Worker" || data.role === "Staff") && (
+                        {(data.role === "Worker" || !data.role) && (
                             <div className='flex flex-col min-w-[200px] bg-purple-300 rounded-md p-4 text-center justify-center flex-1 relative'>
                                 <h1 className='font-bold text-lg'>Standard Output</h1>
                                 <h2 className='font-semibold text-3xl mt-2'>{data.workerEfficiency?.standardOutputQtyPerShift ?? 'N/A'}</h2>
@@ -214,9 +214,9 @@ const Details = () => {
                     {data.role === "Supervisor" ?  (
                         <div className='flex flex-col bg-yellow-200 flex-1 p-4 rounded-md'>
                             <h2 className='font-bold text-xl'>Supervised Batches</h2>
-                            <h2 className='font-semibold'>{data.supervisedBatches?.length}</h2>
+                            <h2 className='font-semibold'>{data.supervisedBatches?.length || 0}</h2>
                         </div>
-                    ): data.role === "ProductionManager" ? (
+                    ): ((data.role === "Admin" || data.role === undefined)) ? (
                         <div className='flex flex-col bg-yellow-200 flex-1 p-4 rounded-md '>
                             <h2 className='font-bold text-xl'>Created Formulations</h2>
                             <h2 className='font-semibold'>{data.createdFormulations?.length}</h2>
@@ -226,10 +226,10 @@ const Details = () => {
             </div>
 
             {/* Standard Output Modal */}
-            {showStandardOutputModal && (
+            {showStandardOutputModal && data.id && (
                 <SetStandardOutputModal
                     userId={data.id}
-                    workerName={`${data.firstName} ${data.lastName}`}
+                    workerName={`${data.firstName || ''} ${data.lastName || ''}`}
                     currentStandardOutput={data.workerEfficiency?.standardOutputQtyPerShift ?? 0}
                     onClose={() => setShowStandardOutputModal(false)}
                     onSuccess={() => {

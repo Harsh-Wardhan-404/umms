@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 import { PrismaClient } from "./generated/prisma";
 import stockRoutes from "./routes/stockRoutes";
 import authRoutes from "./routes/authRoutes";
@@ -54,10 +56,35 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-// 404 handler
-app.use("*", (req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
+// Serve static files from frontend build (production)
+// Only serve frontend if dist folder exists
+const frontendDistPath = path.join(__dirname, "../../frontend/dist");
+
+if (fs.existsSync(frontendDistPath)) {
+  // Serve static assets (JS, CSS, images, etc.)
+  app.use(express.static(frontendDistPath));
+
+  // Serve frontend for all non-API routes (SPA fallback for React Router)
+  app.get("*", (req, res, next) => {
+    // Don't serve frontend for API routes
+    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+      return res.status(404).json({ error: "Route not found" });
+    }
+    // Serve index.html for all other routes (React Router handles client-side routing)
+    res.sendFile(path.join(frontendDistPath, "index.html"));
+  });
+} else {
+  // If frontend dist doesn't exist, just return 404 for non-API routes
+  app.use("*", (req, res) => {
+    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+      return res.status(404).json({ error: "Route not found" });
+    }
+    res.status(404).json({ 
+      error: "Route not found",
+      message: "Frontend not built. Run 'npm run build' in the frontend directory."
+    });
+  });
+}
 
 const PORT = process.env.PORT || 3000;
 
