@@ -44,8 +44,8 @@ const KeyPerformanceIndicators = () => {
         ] = await Promise.allSettled([
           api.get("/api/stock/materials?type=Raw"),
           api.get("/api/stock/alerts/low-stock"),
-          api.get("/api/batch/stats/overview"),
-          api.get("/api/formulation"),
+          api.get("/api/batches/stats/overview"),
+          api.get("/api/formulations"),
           api.get("/api/users"),
           api.get("/api/profit-loss/analytics/summary"),
         ])

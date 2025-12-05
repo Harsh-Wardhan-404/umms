@@ -12,34 +12,43 @@ function generateInvoiceNumber(): string {
   return `INV-${timestamp.toUpperCase()}-${random.toUpperCase()}`;
 }
 
-// Calculate GST based on HSN code and amount
-function calculateGST(amount: number, hsnCode: string): {
+// Check if transaction is intrastate (same state) based on GST numbers
+function isIntrastate(clientGST: string, companyGST: string = '27'): boolean {
+  if (!clientGST || clientGST.length < 2) return false;
+  const clientStateCode = clientGST.substring(0, 2);
+  const companyStateCode = companyGST.substring(0, 2);
+  return clientStateCode === companyStateCode;
+}
+
+// Calculate GST for a single item based on GST rate and transaction type
+function calculateItemGST(amount: number, gstRate: number, isIntrastateTransaction: boolean): {
   cgst: number;
   sgst: number;
   igst: number;
   totalTax: number;
 } {
-  // Default GST rate (can be enhanced with HSN code mapping)
-  const gstRate = 18; // 18% GST
-  
-  if (hsnCode.startsWith("99")) {
-    // Interstate supply - IGST
+  if (gstRate === 0) {
+    return { cgst: 0, sgst: 0, igst: 0, totalTax: 0 };
+  }
+
+  if (isIntrastateTransaction) {
+    // Intrastate: Split GST into CGST and SGST
+    const cgst = (amount * gstRate) / 200; // Half of GST rate
+    const sgst = (amount * gstRate) / 200; // Half of GST rate
+    return {
+      cgst: Math.round(cgst * 100) / 100,
+      sgst: Math.round(sgst * 100) / 100,
+      igst: 0,
+      totalTax: Math.round((cgst + sgst) * 100) / 100,
+    };
+  } else {
+    // Interstate: Only IGST
     const igst = (amount * gstRate) / 100;
     return {
       cgst: 0,
       sgst: 0,
-      igst,
-      totalTax: igst,
-    };
-  } else {
-    // Intrastate supply - CGST + SGST
-    const cgst = (amount * (gstRate / 2)) / 100;
-    const sgst = (amount * (gstRate / 2)) / 100;
-    return {
-      cgst,
-      sgst,
-      igst: 0,
-      totalTax: cgst + sgst,
+      igst: Math.round(igst * 100) / 100,
+      totalTax: Math.round(igst * 100) / 100,
     };
   }
 }
@@ -71,8 +80,14 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
       return res.status(404).json({ error: "Client not found" });
     }
 
-    // Validate items and calculate totals
+    // Check if transaction is intrastate
+    const isIntrastateTransaction = isIntrastate(client.gstNumber || '', '27');
+
+    // Validate items and calculate totals with per-item GST
     let subtotal = 0;
+    let totalCGST = 0;
+    let totalSGST = 0;
+    let totalIGST = 0;
     const processedItems = [];
     const invoiceItems = [];
 
@@ -82,11 +97,20 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         quantity,
         pricePerUnit,
         hsnCode,
+        gstRate = 18, // Default to 18% if not provided
       } = item;
 
       if (!finishedGoodId || !quantity || !pricePerUnit || !hsnCode) {
         return res.status(400).json({
           error: "Each item must have: finishedGoodId, quantity, pricePerUnit, hsnCode",
+        });
+      }
+
+      // Validate GST rate (must be one of the Indian GST slabs)
+      const validGSTRates = [0, 5, 12, 18, 28];
+      if (!validGSTRates.includes(gstRate)) {
+        return res.status(400).json({
+          error: `Invalid GST rate: ${gstRate}. Must be one of: ${validGSTRates.join(', ')}`,
         });
       }
 
@@ -108,18 +132,29 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
       const itemTotal = quantity * pricePerUnit;
       subtotal += itemTotal;
 
+      // Calculate GST for this item
+      const itemGST = calculateItemGST(itemTotal, gstRate, isIntrastateTransaction);
+      totalCGST += itemGST.cgst;
+      totalSGST += itemGST.sgst;
+      totalIGST += itemGST.igst;
+
       processedItems.push({
         finishedGoodId,
         quantity,
         pricePerUnit,
         hsnCode,
+        gstRate,
         itemTotal,
       });
     }
 
-    // Calculate GST
-    const gstCalculation = calculateGST(subtotal, items[0].hsnCode);
-    const totalAmount = subtotal + gstCalculation.totalTax;
+    // Calculate total tax and amount
+    const totalTax = totalCGST + totalSGST + totalIGST;
+    const totalAmount = subtotal + totalTax;
+
+    // Determine the primary GST rate for display (use the highest rate if multiple)
+    const gstRates = processedItems.map(item => item.gstRate).filter((rate, index, self) => self.indexOf(rate) === index);
+    const primaryGSTRate = Math.max(...gstRates);
 
     // Create invoice
     const invoice = await prisma.invoice.create({
@@ -132,11 +167,11 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         items: processedItems,
         subtotal,
         taxDetails: {
-          cgst: gstCalculation.cgst,
-          sgst: gstCalculation.sgst,
-          igst: gstCalculation.igst,
-          totalTax: gstCalculation.totalTax,
-          gstRate: gstCalculation.totalTax > 0 ? 18 : 0,
+          cgst: Math.round(totalCGST * 100) / 100,
+          sgst: Math.round(totalSGST * 100) / 100,
+          igst: Math.round(totalIGST * 100) / 100,
+          totalTax: Math.round(totalTax * 100) / 100,
+          gstRate: primaryGSTRate,
         },
         totalAmount,
         notes,

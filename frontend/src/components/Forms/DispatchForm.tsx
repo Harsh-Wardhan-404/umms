@@ -13,6 +13,7 @@ interface Invoice {
   id: string;
   invoiceNumber: string;
   totalAmount: number;
+  paymentStatus?: string;
   client: {
     name: string;
     address: string;
@@ -20,6 +21,7 @@ interface Invoice {
 }
 
 const DispatchForm = ({ setOpen, type, data }: DispatchFormProps) => {
+  console.log('DispatchForm component rendered, type:', type, 'data:', data);
   const [formData, setFormData] = useState({
     invoiceId: data?.invoiceId || '',
     courierName: data?.courierName || '',
@@ -31,10 +33,13 @@ const DispatchForm = ({ setOpen, type, data }: DispatchFormProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('DispatchForm useEffect called, type:', type);
     if (type === 'create') {
+      console.log('Calling fetchAvailableInvoices...');
       fetchAvailableInvoices();
     } else if (data?.invoice) {
       setSelectedInvoice(data.invoice);
@@ -42,34 +47,59 @@ const DispatchForm = ({ setOpen, type, data }: DispatchFormProps) => {
   }, [type, data]);
 
   const fetchAvailableInvoices = async () => {
+    console.log('fetchAvailableInvoices function called');
+    setLoadingInvoices(true);
     try {
+      setError(null);
+      console.log('Fetching invoices from API...');
       // Fetch invoices that don't have dispatches yet
+      // Allow all payment statuses: Pending, Partial, and Paid
       const response = await api.get('/api/invoices', {
         params: {
           page: 1,
-          limit: 100,
-          paymentStatus: 'Paid' // Optional: only show paid invoices
+          limit: 1000 // Increased limit to get all invoices
         }
       });
+      
+      console.log('API response received:', response);
 
       // Filter out invoices that already have dispatches
-      const allInvoices = response.data.invoices;
+      const allInvoices = response.data?.invoices || [];
+      console.log('Fetched invoices:', allInvoices.length, 'Total invoices');
+      
       const dispatchesResponse = await api.get('/api/dispatches', {
         params: { limit: 1000 }
       });
       
-      const invoicesWithDispatch = dispatchesResponse.data.dispatches.map(
-        (d: any) => d.invoice.id
-      );
+      const invoicesWithDispatch = (dispatchesResponse.data?.dispatches || []).map(
+        (d: any) => d.invoice?.id
+      ).filter(Boolean); // Remove any undefined/null values
+      
+      console.log('Invoices with dispatch:', invoicesWithDispatch.length);
 
       const availableInvoices = allInvoices.filter(
         (inv: Invoice) => !invoicesWithDispatch.includes(inv.id)
       );
 
+      console.log('Available invoices for dispatch:', availableInvoices.length);
+      console.log('Available invoices:', availableInvoices.map((inv: Invoice) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        paymentStatus: (inv as any).paymentStatus
+      })));
+
       setInvoices(availableInvoices);
+      console.log('Invoices set in state:', availableInvoices.length);
     } catch (err: any) {
       console.error('Error fetching invoices:', err);
-      setError('Failed to fetch available invoices');
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch available invoices');
+    } finally {
+      setLoadingInvoices(false);
     }
   };
 
@@ -196,14 +226,21 @@ const DispatchForm = ({ setOpen, type, data }: DispatchFormProps) => {
                 name="invoiceId"
                 value={formData.invoiceId}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2 dark:bg-[#282C35] dark:border-gray-600 dark:text-white"
+                disabled={loadingInvoices}
+                className="w-full border border-gray-300 rounded px-3 py-2 dark:bg-[#282C35] dark:border-gray-600 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">Select an invoice</option>
-                {invoices.map(invoice => (
-                  <option key={invoice.id} value={invoice.id}>
-                    {invoice.invoiceNumber} - {invoice.client.name} - ₹{invoice.totalAmount.toFixed(2)}
-                  </option>
-                ))}
+                <option value="">
+                  {loadingInvoices ? 'Loading invoices...' : 'Select an invoice'}
+                </option>
+                {!loadingInvoices && invoices.length === 0 ? (
+                  <option value="" disabled>No available invoices (all may have dispatches already)</option>
+                ) : (
+                  invoices.map(invoice => (
+                    <option key={invoice.id} value={invoice.id}>
+                      {invoice.invoiceNumber} - {invoice.client.name} - ₹{invoice.totalAmount.toFixed(2)} {invoice.paymentStatus ? `(${invoice.paymentStatus})` : ''}
+                    </option>
+                  ))
+                )}
               </select>
               {validationErrors.invoiceId && (
                 <p className="text-red-500 text-xs mt-1">{validationErrors.invoiceId}</p>

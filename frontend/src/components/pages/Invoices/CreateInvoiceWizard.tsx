@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, Trash2, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
-import { calculateGST, formatIndianCurrency, convertToWords } from '@/lib/gstCalculator';
+import { formatIndianCurrency, convertToWords } from '@/lib/gstCalculator';
 
 interface Client {
   id: string;
@@ -34,6 +34,7 @@ interface InvoiceItem {
   pricePerUnit: number;
   hsnCode: string;
   amount: number;
+  gstRate: number; // GST slab rate (0, 5, 12, 18, 28)
 }
 
 const CreateInvoiceWizard = () => {
@@ -104,16 +105,21 @@ const CreateInvoiceWizard = () => {
       pricePerUnit: good.unitPrice,
       hsnCode: good.hsnCode,
       amount: good.unitPrice,
+      gstRate: 18, // Default to 18% (most common for cosmetics/pharmaceuticals)
     };
 
     setItems([...items, newItem]);
     setError(null);
   };
 
-  const handleUpdateItem = (index: number, field: 'quantity' | 'pricePerUnit', value: number) => {
+  const handleUpdateItem = (index: number, field: 'quantity' | 'pricePerUnit' | 'gstRate', value: number) => {
     const updatedItems = [...items];
-    updatedItems[index][field] = value;
-    updatedItems[index].amount = updatedItems[index].quantity * updatedItems[index].pricePerUnit;
+    if (field === 'gstRate') {
+      updatedItems[index].gstRate = value;
+    } else {
+      updatedItems[index][field] = value;
+      updatedItems[index].amount = updatedItems[index].quantity * updatedItems[index].pricePerUnit;
+    }
     setItems(updatedItems);
   };
 
@@ -121,15 +127,73 @@ const CreateInvoiceWizard = () => {
     setItems(items.filter((_, i) => i !== index));
   };
 
+  // Indian GST slabs as per regulations
+  const GST_SLABS = [
+    { value: 0, label: '0% (Nil Rate)' },
+    { value: 5, label: '5%' },
+    { value: 12, label: '12%' },
+    { value: 18, label: '18%' },
+    { value: 28, label: '28%' },
+  ];
+
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
-    const tax = calculateGST(
-      subtotal,
-      selectedClient?.gstNumber || '',
-      '27', // Company GST (Maharashtra)
-      items[0]?.hsnCode || ''
-    );
-    return tax;
+    const isIntrastateTransaction = selectedClient?.gstNumber 
+      ? selectedClient.gstNumber.substring(0, 2) === '27' 
+      : false;
+
+    // Calculate tax per item and group by GST slab
+    const taxBySlab: Record<number, { subtotal: number; cgst: number; sgst: number; igst: number }> = {};
+    
+    items.forEach(item => {
+      if (!taxBySlab[item.gstRate]) {
+        taxBySlab[item.gstRate] = { subtotal: 0, cgst: 0, sgst: 0, igst: 0 };
+      }
+      
+      taxBySlab[item.gstRate].subtotal += item.amount;
+      
+      if (isIntrastateTransaction) {
+        // Intrastate: Split GST into CGST and SGST
+        taxBySlab[item.gstRate].cgst += (item.amount * item.gstRate) / 200;
+        taxBySlab[item.gstRate].sgst += (item.amount * item.gstRate) / 200;
+      } else {
+        // Interstate: Only IGST
+        taxBySlab[item.gstRate].igst += (item.amount * item.gstRate) / 100;
+      }
+    });
+
+    // Round all values
+    Object.keys(taxBySlab).forEach(slab => {
+      const rate = parseFloat(slab);
+      taxBySlab[rate].cgst = Math.round(taxBySlab[rate].cgst * 100) / 100;
+      taxBySlab[rate].sgst = Math.round(taxBySlab[rate].sgst * 100) / 100;
+      taxBySlab[rate].igst = Math.round(taxBySlab[rate].igst * 100) / 100;
+    });
+
+    // Calculate totals
+    let totalCGST = 0;
+    let totalSGST = 0;
+    let totalIGST = 0;
+
+    Object.values(taxBySlab).forEach(tax => {
+      totalCGST += tax.cgst;
+      totalSGST += tax.sgst;
+      totalIGST += tax.igst;
+    });
+
+    const totalTax = totalCGST + totalSGST + totalIGST;
+    const totalAmount = subtotal + totalTax;
+
+    return {
+      subtotal: Math.round(subtotal * 100) / 100,
+      cgst: Math.round(totalCGST * 100) / 100,
+      sgst: Math.round(totalSGST * 100) / 100,
+      igst: Math.round(totalIGST * 100) / 100,
+      totalTax: Math.round(totalTax * 100) / 100,
+      totalAmount: Math.round(totalAmount * 100) / 100,
+      isIntrastate: isIntrastateTransaction,
+      taxBySlab, // Include breakdown by slab
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,6 +231,7 @@ const CreateInvoiceWizard = () => {
           quantity: item.quantity,
           pricePerUnit: item.pricePerUnit,
           hsnCode: item.hsnCode,
+          gstRate: item.gstRate, // Include GST rate per item
         })),
         notes,
       };
@@ -333,6 +398,7 @@ const CreateInvoiceWizard = () => {
                     <th className="text-left p-3">HSN</th>
                     <th className="text-right p-3">Qty</th>
                     <th className="text-right p-3">Price</th>
+                    <th className="text-center p-3">GST Slab</th>
                     <th className="text-right p-3">Amount</th>
                     <th className="text-center p-3">Action</th>
                   </tr>
@@ -362,6 +428,19 @@ const CreateInvoiceWizard = () => {
                           onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
                           className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
                         />
+                      </td>
+                      <td className="p-3">
+                        <select
+                          value={item.gstRate}
+                          onChange={(e) => handleUpdateItem(index, 'gstRate', parseFloat(e.target.value))}
+                          className="border border-gray-300 rounded px-2 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          {GST_SLABS.map(slab => (
+                            <option key={slab.value} value={slab.value}>
+                              {slab.label}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                       <td className="p-3 text-right font-semibold">
                         {formatIndianCurrency(item.amount)}
@@ -400,23 +479,62 @@ const CreateInvoiceWizard = () => {
                 <span className="font-semibold">{formatIndianCurrency(totals.subtotal)}</span>
               </div>
 
-              {totals.isIntrastate ? (
-                <>
-                  <div className="flex justify-between">
-                    <span>CGST @ {totals.gstRate / 2}%:</span>
-                    <span>{formatIndianCurrency(totals.cgst)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>SGST @ {totals.gstRate / 2}%:</span>
-                    <span>{formatIndianCurrency(totals.sgst)}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex justify-between">
-                  <span>IGST @ {totals.gstRate}%:</span>
-                  <span>{formatIndianCurrency(totals.igst)}</span>
+              {/* Tax breakdown by GST slab */}
+              {Object.keys(totals.taxBySlab).length > 0 && (
+                <div className="border-t border-gray-300 pt-2 mt-2">
+                  <p className="text-sm font-semibold mb-2 text-gray-700">Tax Breakdown by GST Slab:</p>
+                  {Object.entries(totals.taxBySlab)
+                    .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])) // Sort by rate descending
+                    .map(([rate, tax]) => {
+                      const gstRate = parseFloat(rate);
+                      if (gstRate === 0 || (tax.cgst === 0 && tax.sgst === 0 && tax.igst === 0)) return null;
+                      
+                      return (
+                        <div key={rate} className="mb-2 pl-4 border-l-2 border-blue-200">
+                          <p className="text-xs font-semibold text-gray-600 mb-1">GST @ {gstRate}% (Subtotal: {formatIndianCurrency(tax.subtotal)})</p>
+                          {totals.isIntrastate ? (
+                            <>
+                              <div className="flex justify-between text-sm">
+                                <span className="pl-2">CGST @ {gstRate / 2}%:</span>
+                                <span>{formatIndianCurrency(tax.cgst)}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="pl-2">SGST @ {gstRate / 2}%:</span>
+                                <span>{formatIndianCurrency(tax.sgst)}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex justify-between text-sm">
+                              <span className="pl-2">IGST @ {gstRate}%:</span>
+                              <span>{formatIndianCurrency(tax.igst)}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                 </div>
               )}
+
+              {/* Total Tax Summary */}
+              <div className="border-t border-gray-300 pt-2 mt-2">
+                {totals.isIntrastate ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="font-semibold">Total CGST:</span>
+                      <span className="font-semibold">{formatIndianCurrency(totals.cgst)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold">Total SGST:</span>
+                      <span className="font-semibold">{formatIndianCurrency(totals.sgst)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Total IGST:</span>
+                    <span className="font-semibold">{formatIndianCurrency(totals.igst)}</span>
+                  </div>
+                )}
+              </div>
 
               <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <div className="flex justify-between text-xl font-bold">

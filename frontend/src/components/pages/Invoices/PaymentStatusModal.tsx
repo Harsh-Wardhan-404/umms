@@ -143,7 +143,7 @@ const PaymentStatusModal = ({ invoice, setOpen, onUpdate }: PaymentStatusModalPr
               <div>
                 <p className="text-sm font-medium text-green-800">✓ Full Payment</p>
                 <p className="text-xs text-green-600 mt-1">
-                  This will mark the invoice as fully paid and allow dispatch creation.
+                  This will mark the invoice as fully paid.
                 </p>
               </div>
             </div>
