@@ -95,7 +95,13 @@ const InvoicePrint = () => {
               <h1 className="text-3xl font-bold text-gray-900">TAX INVOICE</h1>
               <p className="text-sm text-gray-600 mt-1">ORIGINAL FOR RECIPIENT</p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end">
+              <img 
+                src="/logo.jpeg" 
+                alt="Company Logo" 
+                className="h-20 w-auto mb-2"
+                style={{ maxHeight: '80px', objectFit: 'contain' }}
+              />
               <h2 className="text-xl font-bold">YOUR COMPANY NAME</h2>
               <p className="text-sm">123 Business Address</p>
               <p className="text-sm">City, State - 400001</p>

@@ -8,7 +8,14 @@ const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.Se
     
     return (
         <div className="flex justify-between items-center h-14 px-5 py-3 bg-slate-200 dark:bg-gray-700">
-            <h1 className="text-lg font-bold">UMMS</h1>
+            <div className="flex items-center gap-3">
+                <img 
+                    src="/logo.jpeg" 
+                    alt="Company Logo" 
+                    className="h-10 w-auto"
+                    style={{ maxHeight: '40px', objectFit: 'contain' }}
+                />
+            </div>
             <div className="hidden md:flex items-center">
                 <input type="text" className="border border-gray-300 rounded-l-md p-1 bg-white placeholder:text-slate-400 lg:w-[300px]" placeholder="Search anything..." />
                 <button className="border border-gray-300 px-3 py-1 bg-blue-500 text-white rounded-r-md cursor-pointer"><Search /></button>

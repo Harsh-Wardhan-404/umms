@@ -132,6 +132,14 @@ const ProductionReport = () => {
       <div className="bg-white border border-gray-300 rounded-lg p-8 print:border-0 print:p-0">
         {/* Report Header */}
         <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo.jpeg" 
+              alt="Company Logo" 
+              className="h-20 w-auto"
+              style={{ maxHeight: '80px', objectFit: 'contain' }}
+            />
+          </div>
           <h1 className="text-3xl font-bold mb-2">Production Report</h1>
           <p className="text-lg text-gray-600">Batch Code: {report.batchInfo.batchCode}</p>
           <p className="text-sm text-gray-500">
