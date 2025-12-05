@@ -69,37 +69,49 @@ umms/
 
 5. **Run the application**
 
-   **Development Mode** (separate servers):
+   **Development Mode** (separate servers - recommended for development):
    ```bash
-   # From the root directory
+   # Option 1: Run both from root directory
    npm run dev          # Run both frontend and backend
    npm run dev:watch    # Run with auto-reload for backend
    ```
 
-   Or run separately:
    ```bash
+   # Option 2: Run separately in different terminals
    # Terminal 1 - Backend
    cd backend
    npm run dev
 
-   # Terminal 2 - Frontend
+   # Terminal 2 - Frontend  
    cd frontend
    npm run dev
    ```
+   
+   - Frontend will run on `http://localhost:5173` (Vite default)
+   - Backend will run on `http://localhost:3000`
+   - Frontend dev server has hot module replacement (HMR) for instant updates
 
-   **Production Mode** (single server):
+   **Production Mode** (single server - frontend served from backend):
    ```bash
-   # Build the frontend
+   # Step 1: Build the frontend
    cd frontend
    npm run build
+   
+   # This creates a 'dist' folder with optimized production files
+   ```
 
-   # Start the backend (will serve frontend automatically)
+   ```bash
+   # Step 2: Start the backend (will serve frontend automatically)
    cd ../backend
    npm run start
    ```
    
-   The backend will automatically serve the frontend from `frontend/dist/` if it exists.
-   Access the application at `http://localhost:3000`
+   - The backend automatically detects `frontend/dist/` and serves it
+   - Access the application at `http://localhost:3000`
+   - API routes work at `http://localhost:3000/api/*`
+   - All other routes serve the React frontend (SPA routing)
+
+   **Note**: If `frontend/dist/` doesn't exist, the backend will still run but show a helpful error message for non-API routes.
 
 ## 📚 Documentation
 
