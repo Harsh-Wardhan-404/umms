@@ -91,18 +91,20 @@ const InvoicePrint = () => {
         {/* Header */}
         <div className="border-b-4 border-gray-800 pb-4 mb-4">
           <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">TAX INVOICE</h1>
-              <p className="text-sm text-gray-600 mt-1">ORIGINAL FOR RECIPIENT</p>
-            </div>
-            <div className="text-right flex flex-col items-end">
+            <div className="flex items-start gap-4">
               <img 
                 src="/logo.jpeg" 
                 alt="Company Logo" 
-                className="h-20 w-auto mb-2"
+                className="h-20 w-auto"
                 style={{ maxHeight: '80px', objectFit: 'contain' }}
               />
-              <h2 className="text-xl font-bold">YOUR COMPANY NAME</h2>
+              {/* <div>
+                <h1 className="text-3xl font-bold text-gray-900">TAX INVOICE</h1>
+                <p className="text-sm text-gray-600 mt-1">ORIGINAL FOR RECIPIENT</p>
+              </div> */}
+            </div>
+            <div className="text-right">
+              <h2 className="text-xl font-bold">Sahyadri Nutraceuticals</h2>
               <p className="text-sm">123 Business Address</p>
               <p className="text-sm">City, State - 400001</p>
               <p className="text-sm">GSTIN: 27AAAAA0000A1Z5</p>
@@ -244,18 +246,19 @@ const InvoicePrint = () => {
             <p className="font-semibold mb-2">Terms & Conditions:</p>
             <ul className="list-disc list-inside space-y-1">
               <li>Payment due within terms specified</li>
-              <li>Interest @ 18% p.a. on delayed payments</li>
+              {/* <li>Interest @ 18% p.a. on delayed payments</li> */}
               <li>Subject to jurisdiction</li>
             </ul>
           </div>
 
-          <div className="border border-gray-300 p-3 rounded">
+          {/* Temporarily hidden - Bank Details */}
+          {/* <div className="border border-gray-300 p-3 rounded">
             <p className="font-semibold mb-2">Bank Details:</p>
             <p>Bank Name: XYZ Bank</p>
             <p>Account No: 1234567890</p>
             <p>IFSC Code: XYZB0001234</p>
             <p>Branch: Mumbai</p>
-          </div>
+          </div> */}
         </div>
 
         {/* Footer */}
@@ -265,7 +268,7 @@ const InvoicePrint = () => {
             <p>Generated on: {new Date().toLocaleString('en-IN')}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-semibold mb-8">For Your Company Name</p>
+            <p className="text-sm font-semibold mb-8">For Sahyadri Nutraceuticals</p>
             <p className="text-sm border-t border-gray-400 pt-1">Authorized Signatory</p>
           </div>
         </div>
