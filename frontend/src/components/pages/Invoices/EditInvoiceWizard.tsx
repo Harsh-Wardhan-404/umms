@@ -110,16 +110,38 @@ const EditInvoiceWizard = () => {
             setDueDate(new Date(invoice.dueDate).toISOString().split('T')[0]);
             setNotes(invoice.notes || '');
 
-            const mappedItems = invoice.items.map((item: any) => ({
-                finishedGoodId: item.finishedGoodId,
-                productName: item.finishedGood?.productName || 'Unknown Product',
-                batchCode: item.finishedGood?.batch?.batchCode || 'Unknown Batch',
-                quantity: item.quantity || 0,
-                pricePerUnit: item.pricePerUnit || 0,
-                hsnCode: item.hsnCode,
-                amount: item.amount || 0,
-                gstRate: item.gstRate || 18,
-            }));
+            // Use invoiceItems instead of items, and get gstRate from the JSON items array
+            const jsonItems = invoice.items || [];
+            // Create a map by finishedGoodId for quick lookup, handling multiple items with same ID by using first match
+            const jsonItemsMap = new Map();
+            jsonItems.forEach((item: any, index: number) => {
+                if (item.finishedGoodId && !jsonItemsMap.has(item.finishedGoodId)) {
+                    jsonItemsMap.set(item.finishedGoodId, item);
+                }
+                // Also store by index as fallback
+                jsonItemsMap.set(`index_${index}`, item);
+            });
+
+            const mappedItems = (invoice.invoiceItems || []).map((item: any, index: number) => {
+                // Try to get gstRate from JSON items array by finishedGoodId first, then by index
+                const jsonItem = jsonItemsMap.get(item.finishedGoodId) || jsonItemsMap.get(`index_${index}`) || jsonItems[index];
+                const gstRate = jsonItem?.gstRate ?? (invoice.taxDetails?.gstRate ?? 18);
+
+                const quantity = item.quantity || 0;
+                const pricePerUnit = item.pricePerUnit || 0;
+                const amount = quantity * pricePerUnit;
+
+                return {
+                    finishedGoodId: item.finishedGoodId,
+                    productName: item.finishedGood?.productName || 'Unknown Product',
+                    batchCode: item.finishedGood?.batch?.batchCode || item.batchCode || 'Unknown Batch',
+                    quantity: quantity,
+                    pricePerUnit: pricePerUnit,
+                    hsnCode: item.hsnCode || '',
+                    amount: amount,
+                    gstRate: gstRate,
+                };
+            });
             setItems(mappedItems);
         } catch (err) {
             console.error('Error fetching invoice details:', err);
