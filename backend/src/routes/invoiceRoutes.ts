@@ -66,6 +66,11 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
       companyAddress,
       companyGstin,
       companyPhone,
+      bankName,
+      bankBranch,
+      bankAccountNo,
+      bankIfscCode,
+      bankUpiId,
     } = req.body;
 
     // Validate required fields
@@ -121,6 +126,7 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
       // Validate finished goods
       const finishedGood = await prisma.finishedGood.findUnique({
         where: { id: finishedGoodId },
+        include: { batch: true },
       });
 
       if (!finishedGood) {
@@ -149,6 +155,7 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         hsnCode,
         gstRate,
         itemTotal,
+        batchCode: finishedGood.batch.batchCode || "",
       });
     }
 
@@ -183,6 +190,11 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         companyAddress: companyAddress || null,
         companyGstin: companyGstin || null,
         companyPhone: companyPhone || null,
+        bankName: bankName || null,
+        bankBranch: bankBranch || null,
+        bankAccountNo: bankAccountNo || null,
+        bankIfscCode: bankIfscCode || null,
+        bankUpiId: bankUpiId || null,
         paymentStatus: "Pending",
       },
       include: {
@@ -200,10 +212,7 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
           data: {
             invoiceId: invoice.id,
             finishedGoodId: item.finishedGoodId,
-            batchCode: (await prisma.finishedGood.findUnique({
-              where: { id: item.finishedGoodId },
-              include: { batch: true },
-            }))?.batch.batchCode || "",
+            batchCode: item.batchCode,
             quantity: item.quantity,
             hsnCode: item.hsnCode,
             pricePerUnit: item.pricePerUnit,
@@ -354,6 +363,11 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
       companyAddress,
       companyGstin,
       companyPhone,
+      bankName,
+      bankBranch,
+      bankAccountNo,
+      bankIfscCode,
+      bankUpiId,
     } = req.body;
 
     // Validate required fields
@@ -441,6 +455,7 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
       // Validate finished goods
       const finishedGood = await prisma.finishedGood.findUnique({
         where: { id: finishedGoodId },
+        include: { batch: true },
       });
 
       if (!finishedGood) {
@@ -469,6 +484,7 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
         hsnCode,
         gstRate,
         itemTotal,
+        batchCode: finishedGood.batch.batchCode || "",
       });
     }
 
@@ -507,6 +523,11 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
         companyAddress: companyAddress || null,
         companyGstin: companyGstin || null,
         companyPhone: companyPhone || null,
+        bankName: bankName || null,
+        bankBranch: bankBranch || null,
+        bankAccountNo: bankAccountNo || null,
+        bankIfscCode: bankIfscCode || null,
+        bankUpiId: bankUpiId || null,
       },
       include: {
         client: true,
@@ -532,10 +553,7 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
           data: {
             invoiceId: id,
             finishedGoodId: item.finishedGoodId,
-            batchCode: (await prisma.finishedGood.findUnique({
-              where: { id: item.finishedGoodId },
-              include: { batch: true },
-            }))?.batch.batchCode || "",
+            batchCode: item.batchCode,
             quantity: item.quantity,
             hsnCode: item.hsnCode,
             pricePerUnit: item.pricePerUnit,

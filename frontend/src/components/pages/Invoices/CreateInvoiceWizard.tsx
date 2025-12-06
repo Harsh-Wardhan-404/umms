@@ -57,6 +57,13 @@ const CreateInvoiceWizard = () => {
   const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
   const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
   const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
+  
+  // Bank details
+  const [bankName, setBankName] = useState('');
+  const [bankBranch, setBankBranch] = useState('');
+  const [bankAccountNo, setBankAccountNo] = useState('');
+  const [bankIfscCode, setBankIfscCode] = useState('');
+  const [bankUpiId, setBankUpiId] = useState('');
 
   useEffect(() => {
     fetchClients();
@@ -247,6 +254,11 @@ const CreateInvoiceWizard = () => {
         companyAddress,
         companyGstin,
         companyPhone,
+        bankName: bankName || null,
+        bankBranch: bankBranch || null,
+        bankAccountNo: bankAccountNo || null,
+        bankIfscCode: bankIfscCode || null,
+        bankUpiId: bankUpiId || null,
       };
 
       const response = await api.post('/api/invoices', payload);
@@ -436,6 +448,67 @@ const CreateInvoiceWizard = () => {
                 onChange={(e) => setCompanyPhone(e.target.value)}
                 className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., +91-1234567890"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bank Details */}
+        <div className="border border-gray-300 rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Bank Details (Optional)</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Bank Name</label>
+              <input
+                type="text"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., State Bank of India"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Branch</label>
+              <input
+                type="text"
+                value={bankBranch}
+                onChange={(e) => setBankBranch(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Mumbai"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Account Number</label>
+              <input
+                type="text"
+                value={bankAccountNo}
+                onChange={(e) => setBankAccountNo(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 1234567890"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">IFSC Code</label>
+              <input
+                type="text"
+                value={bankIfscCode}
+                onChange={(e) => setBankIfscCode(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., SBIN0001234"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">UPI ID</label>
+              <input
+                type="text"
+                value={bankUpiId}
+                onChange={(e) => setBankUpiId(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., company@upi"
               />
             </div>
           </div>

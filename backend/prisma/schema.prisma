@@ -233,6 +233,11 @@ model Invoice {
   companyAddress  String?  @map("company_address")
   companyGstin    String?  @map("company_gstin")
   companyPhone    String?  @map("company_phone")
+  bankName        String?  @map("bank_name")
+  bankBranch      String?  @map("bank_branch")
+  bankAccountNo   String?  @map("bank_account_no")
+  bankIfscCode    String?  @map("bank_ifsc_code")
+  bankUpiId       String?  @map("bank_upi_id")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 

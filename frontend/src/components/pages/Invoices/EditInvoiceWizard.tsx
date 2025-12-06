@@ -60,6 +60,13 @@ const EditInvoiceWizard = () => {
     const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
     const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
     const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
+    
+    // Bank details
+    const [bankName, setBankName] = useState('');
+    const [bankBranch, setBankBranch] = useState('');
+    const [bankAccountNo, setBankAccountNo] = useState('');
+    const [bankIfscCode, setBankIfscCode] = useState('');
+    const [bankUpiId, setBankUpiId] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -123,6 +130,13 @@ const EditInvoiceWizard = () => {
             setCompanyAddress(invoice.companyAddress || '123 Business Address\nCity, State - 400001');
             setCompanyGstin(invoice.companyGstin || '27AAAAA0000A1Z5');
             setCompanyPhone(invoice.companyPhone || '+91-1234567890');
+            
+            // Load bank details
+            setBankName(invoice.bankName || '');
+            setBankBranch(invoice.bankBranch || '');
+            setBankAccountNo(invoice.bankAccountNo || '');
+            setBankIfscCode(invoice.bankIfscCode || '');
+            setBankUpiId(invoice.bankUpiId || '');
 
             // Use invoiceItems instead of items, and get gstRate from the JSON items array
             const jsonItems = invoice.items || [];
@@ -311,6 +325,11 @@ const EditInvoiceWizard = () => {
                 companyAddress,
                 companyGstin,
                 companyPhone,
+                bankName: bankName || null,
+                bankBranch: bankBranch || null,
+                bankAccountNo: bankAccountNo || null,
+                bankIfscCode: bankIfscCode || null,
+                bankUpiId: bankUpiId || null,
                 dueDate: new Date(dueDate).toISOString(),
                 items: items.map(item => ({
                     finishedGoodId: item.finishedGoodId,
