@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RefreshCw, Plus, Eye, Printer, FileText } from 'lucide-react';
+import { RefreshCw, Plus, Eye, Printer, FileText, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Table from '../_components/Table';
@@ -72,7 +72,7 @@ const Invoices = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params: any = {};
       if (filters.paymentStatus) params.paymentStatus = filters.paymentStatus;
       if (filters.startDate) params.startDate = filters.startDate;
@@ -109,7 +109,7 @@ const Invoices = () => {
   const filteredInvoices = invoices.filter(invoice =>
     filters.search
       ? invoice.invoiceNumber.toLowerCase().includes(filters.search.toLowerCase()) ||
-        invoice.client.name.toLowerCase().includes(filters.search.toLowerCase())
+      invoice.client.name.toLowerCase().includes(filters.search.toLowerCase())
       : true
   );
 
@@ -140,6 +140,13 @@ const Invoices = () => {
               title="View Invoice"
             >
               <Eye size={16} />
+            </Button>
+            <Button
+              onClick={() => navigate(`/sales/invoices/${invoice.id}/edit`)}
+              className="flex justify-center items-center w-8 h-8 bg-yellow-300 border-1 border-yellow-500 !text-yellow-700 hover:bg-yellow-400 rounded-md cursor-pointer"
+              title="Edit Invoice"
+            >
+              <Edit size={16} />
             </Button>
             <Button
               onClick={() => navigate(`/sales/invoices/${invoice.id}/print`)}

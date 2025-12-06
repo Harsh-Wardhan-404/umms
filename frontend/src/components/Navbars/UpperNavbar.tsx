@@ -21,12 +21,6 @@ const UpperNavbar = ({ setUserDrawer }: { setUserDrawer: React.Dispatch<React.Se
                 <button className="border border-gray-300 px-3 py-1 bg-blue-500 text-white rounded-r-md cursor-pointer"><Search /></button>
             </div>
             <div className="flex items-center gap-5">
-                <div className="relative">
-                    <Bell fill="black" />
-                    <div className="absolute top-1 right-1 translate-x-1/2 -translate-y-1/2 min-w-[16px] h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
-                        5
-                    </div>
-                </div>
 
                 <div className="flex items-center justify-between border border-blue-400 gap-3 px-3 py-1 rounded-lg cursor-pointer" onClick={() => setUserDrawer(true)}>
                     <CircleUserRound className="text-blue-400" />

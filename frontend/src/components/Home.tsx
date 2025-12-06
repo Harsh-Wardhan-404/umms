@@ -32,6 +32,7 @@ import ProfitLossDashboard from "./pages/ProfitLoss/ProfitLossDashboard";
 import ProfitLossForm from "./pages/ProfitLoss/ProfitLossForm";
 import ProfitLossAnalytics from "./pages/ProfitLoss/ProfitLossAnalytics";
 import { useAuth } from "@/contexts/AuthContext";
+import EditInvoiceWizard from "./pages/Invoices/EditInvoiceWizard";
 
 const Home = () => {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
@@ -78,6 +79,7 @@ const Home = () => {
                             <Route path="/sales/clients/:id" element={<ClientDetails />} />
                             <Route path="/sales/invoices" element={<Invoices />} />
                             <Route path="/sales/invoices/create" element={<CreateInvoiceWizard />} />
+                            <Route path="/sales/invoices/:id/edit" element={<EditInvoiceWizard />} />
                             <Route path="/sales/invoices/:id" element={<InvoiceDetails />} />
                             <Route path="/sales/invoices/:id/print" element={<InvoicePrint />} />
                             <Route path="/sales/dispatches" element={<Dispatches />} />
