@@ -396,8 +396,8 @@ const CreateInvoiceWizard = () => {
                     <th className="text-left p-3">Product</th>
                     <th className="text-left p-3">Batch</th>
                     <th className="text-left p-3">HSN</th>
-                    <th className="text-right p-3">Qty</th>
-                    <th className="text-right p-3">Price</th>
+                    <th className="text-left p-3">Qty</th>
+                    <th className="text-left p-3">Price</th>
                     <th className="text-center p-3">GST Slab</th>
                     <th className="text-right p-3">Amount</th>
                     <th className="text-center p-3">Action</th>
