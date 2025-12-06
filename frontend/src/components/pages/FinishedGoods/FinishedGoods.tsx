@@ -13,6 +13,7 @@ interface FinishedGood {
   productName: string;
   quantityProduced: number;
   availableQuantity: number;
+  unit: string;
   unitPrice: number;
   hsnCode: string;
   qualityStatus: string;
@@ -138,14 +139,14 @@ const FinishedGoods = () => {
       >
         <td className="py-3 px-2 font-semibold">{item.productName}</td>
         <td className="py-3 px-2 font-mono text-sm">{item.batch.batchCode}</td>
-        <td className="hidden md:table-cell py-3 px-2">{item.quantityProduced.toFixed(2)}</td>
+        <td className="hidden md:table-cell py-3 px-2">{item.quantityProduced.toFixed(2)} {item.unit || 'pieces'}</td>
         <td className="py-3 px-2 font-semibold">
-          {item.availableQuantity.toFixed(2)}
+          {item.availableQuantity.toFixed(2)} {item.unit || 'pieces'}
           {item.availableQuantity === 0 && (
             <span className="ml-2 text-xs text-red-500">(Out of Stock)</span>
           )}
         </td>
-        <td className="hidden lg:table-cell py-3 px-2">₹{item.unitPrice.toFixed(2)}</td>
+        <td className="hidden lg:table-cell py-3 px-2">₹{item.unitPrice.toFixed(2)}/{item.unit || 'piece'}</td>
         <td className="hidden lg:table-cell py-3 px-2 font-mono text-sm">{item.hsnCode}</td>
         <td className="py-3 px-2">
           <Badge className={`border ${qualityStatusColors[item.qualityStatus]}`}>
@@ -249,6 +250,7 @@ const FinishedGoods = () => {
           <p className="text-2xl font-bold text-green-900">
             {filteredGoods.reduce((sum, item) => sum + item.availableQuantity, 0).toFixed(2)}
           </p>
+          <p className="text-xs text-green-600 mt-1">(mixed units)</p>
         </div>
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-600 mb-2">Out of Stock</p>

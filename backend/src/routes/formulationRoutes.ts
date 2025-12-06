@@ -17,6 +17,17 @@ router.post("", authenticateToken, requireManager, async (req, res) => {
       });
     }
 
+    // Validate that total composition equals 100%
+    const totalComposition = initialIngredients.reduce(
+      (sum, ing) => sum + (parseFloat(ing.percentageOrComposition) || 0),
+      0
+    );
+    if (Math.abs(totalComposition - 100) > 0.01) {
+      return res.status(400).json({
+        error: `Total composition must equal 100%. Current total: ${totalComposition.toFixed(2)}%`
+      });
+    }
+
     // Check if formulation already exists
     const existingFormulation = await prisma.formulation.findUnique({
       where: { productName }
@@ -105,6 +116,17 @@ router.post("/:formulationId/versions", authenticateToken, requireManager, async
     if (!ingredients || !Array.isArray(ingredients)) {
       return res.status(400).json({
         error: "Ingredients array is required"
+      });
+    }
+
+    // Validate that total composition equals 100%
+    const totalComposition = ingredients.reduce(
+      (sum, ing) => sum + (parseFloat(ing.percentageOrComposition) || 0),
+      0
+    );
+    if (Math.abs(totalComposition - 100) > 0.01) {
+      return res.status(400).json({
+        error: `Total composition must equal 100%. Current total: ${totalComposition.toFixed(2)}%`
       });
     }
 
@@ -597,6 +619,17 @@ router.put("/:formulationId/versions/:versionNumber/ingredients", authenticateTo
     if (!ingredients || !Array.isArray(ingredients)) {
       return res.status(400).json({
         error: "Ingredients array is required"
+      });
+    }
+
+    // Validate that total composition equals 100%
+    const totalComposition = ingredients.reduce(
+      (sum, ing) => sum + (parseFloat(ing.percentageOrComposition) || 0),
+      0
+    );
+    if (Math.abs(totalComposition - 100) > 0.01) {
+      return res.status(400).json({
+        error: `Total composition must equal 100%. Current total: ${totalComposition.toFixed(2)}%`
       });
     }
 

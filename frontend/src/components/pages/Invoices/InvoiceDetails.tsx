@@ -25,6 +25,10 @@ interface InvoiceDetails {
   totalAmount: number;
   paymentStatus: string;
   notes: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyGstin?: string;
+  companyPhone?: string;
   client: {
     name: string;
     email: string;
@@ -44,6 +48,7 @@ interface InvoiceDetails {
     batchCode: string;
     finishedGood: {
       productName: string;
+      unit: string;
     };
   }>;
 }
@@ -247,6 +252,37 @@ const InvoiceDetailsPage = () => {
             )}
           </div>
         </div>
+
+        {/* Company Details */}
+        {invoice.companyName && (
+          <div className="border border-gray-300 rounded-lg p-6 lg:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Company Details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Company Name</p>
+                <p className="font-semibold">{invoice.companyName}</p>
+              </div>
+              {invoice.companyGstin && (
+                <div>
+                  <p className="text-sm text-gray-500">GST Number</p>
+                  <p className="font-mono">{invoice.companyGstin}</p>
+                </div>
+              )}
+              {invoice.companyAddress && (
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Address</p>
+                  <p className="whitespace-pre-line">{invoice.companyAddress}</p>
+                </div>
+              )}
+              {invoice.companyPhone && (
+                <div>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p>{invoice.companyPhone}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Items Table */}
@@ -272,8 +308,8 @@ const InvoiceDetailsPage = () => {
                   <td className="p-3">{item.finishedGood.productName}</td>
                   <td className="p-3 font-mono text-xs">{item.batchCode}</td>
                   <td className="p-3 font-mono text-xs">{item.hsnCode}</td>
-                  <td className="p-3 text-right">{item.quantity.toFixed(2)}</td>
-                  <td className="p-3 text-right">{formatIndianCurrency(item.pricePerUnit)}</td>
+                  <td className="p-3 text-right">{item.quantity.toFixed(2)} {item.finishedGood.unit || 'units'}</td>
+                  <td className="p-3 text-right">{formatIndianCurrency(item.pricePerUnit)}/{item.finishedGood.unit || 'unit'}</td>
                   <td className="p-3 text-right font-semibold">
                     {formatIndianCurrency(item.quantity * item.pricePerUnit)}
                   </td>

@@ -23,6 +23,7 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
     productName: data?.productName || '',
     quantityProduced: data?.quantityProduced || '',
     availableQuantity: data?.availableQuantity || '',
+    unit: data?.unit || 'units',
     unitPrice: data?.unitPrice || '',
     hsnCode: data?.hsnCode || '',
     qualityStatus: data?.qualityStatus || 'Approved',
@@ -179,6 +180,31 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
             </p>
           </div>
 
+          {/* Unit */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">Unit *</label>
+            <select
+              name="unit"
+              value={formData.unit}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="units">Units</option>
+              <option value="kg">Kilograms (kg)</option>
+              <option value="g">Grams (g)</option>
+              <option value="liters">Liters (L)</option>
+              <option value="ml">Milliliters (ml)</option>
+              <option value="bottles">Bottles</option>
+              <option value="jars">Jars</option>
+              <option value="boxes">Boxes</option>
+              <option value="packets">Packets</option>
+            </select>
+            <p className="text-xs text-gray-500">
+              Unit of measurement for this product
+            </p>
+          </div>
+
           {/* Available Quantity */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Available Quantity *</label>
@@ -195,7 +221,7 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
               placeholder="e.g., 95"
             />
             <p className="text-xs text-gray-500">
-              Quantity available for sale (same unit as produced). Cannot exceed quantity produced.
+              Quantity available for sale (in {formData.unit || 'units'}). Cannot exceed quantity produced.
             </p>
           </div>
 
@@ -214,7 +240,7 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
               placeholder="e.g., 450.00"
             />
             <p className="text-xs text-gray-500">
-              Price per unit (per bottle, jar, kg, etc. - same unit as quantity)
+              Price per {formData.unit || 'unit'}
             </p>
           </div>
 

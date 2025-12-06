@@ -62,6 +62,10 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
       dueDate,
       items,
       notes,
+      companyName,
+      companyAddress,
+      companyGstin,
+      companyPhone,
     } = req.body;
 
     // Validate required fields
@@ -175,6 +179,10 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         },
         totalAmount,
         notes,
+        companyName: companyName || null,
+        companyAddress: companyAddress || null,
+        companyGstin: companyGstin || null,
+        companyPhone: companyPhone || null,
         paymentStatus: "Pending",
       },
       include: {
@@ -315,6 +323,7 @@ router.get("/:id", authenticateToken, async (req: Request, res: Response) => {
               },
             },
           },
+          // Note: No orderBy needed - frontend matches by finishedGoodId, not by index
         },
         dispatch: true,
       },
@@ -331,7 +340,229 @@ router.get("/:id", authenticateToken, async (req: Request, res: Response) => {
   }
 });
 
-// 4. Update invoice payment status
+// 4. Update invoice
+router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const {
+      clientId,
+      invoiceDate,
+      dueDate,
+      items,
+      notes,
+      companyName,
+      companyAddress,
+      companyGstin,
+      companyPhone,
+    } = req.body;
+
+    // Validate required fields
+    if (!clientId || !invoiceDate || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        error: "Missing required fields: clientId, invoiceDate, items (array)",
+      });
+    }
+
+    // Check if invoice exists and get current items
+    const existingInvoice = await prisma.invoice.findUnique({
+      where: { id },
+      include: {
+        invoiceItems: true,
+        dispatch: true,
+      },
+    });
+
+    if (!existingInvoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    // Prevent editing if invoice has dispatch
+    if (existingInvoice.dispatch) {
+      return res.status(400).json({
+        error: "Cannot edit invoice that has an associated dispatch",
+        details: "Please delete the dispatch first",
+      });
+    }
+
+    // Validate client exists
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+    });
+
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    // Check if transaction is intrastate
+    const isIntrastateTransaction = isIntrastate(client.gstNumber || '', '27');
+
+    // Restore finished goods quantities from old invoice items
+    for (const oldItem of existingInvoice.invoiceItems) {
+      await prisma.finishedGood.update({
+        where: { id: oldItem.finishedGoodId },
+        data: {
+          availableQuantity: {
+            increment: oldItem.quantity,
+          },
+        },
+      });
+    }
+
+    // Validate new items and calculate totals with per-item GST
+    let subtotal = 0;
+    let totalCGST = 0;
+    let totalSGST = 0;
+    let totalIGST = 0;
+    const processedItems = [];
+
+    for (const item of items) {
+      const {
+        finishedGoodId,
+        quantity,
+        pricePerUnit,
+        hsnCode,
+        gstRate = 18, // Default to 18% if not provided
+      } = item;
+
+      if (!finishedGoodId || !quantity || !pricePerUnit || !hsnCode) {
+        return res.status(400).json({
+          error: "Each item must have: finishedGoodId, quantity, pricePerUnit, hsnCode",
+        });
+      }
+
+      // Validate GST rate (must be one of the Indian GST slabs)
+      const validGSTRates = [0, 5, 12, 18, 28];
+      if (!validGSTRates.includes(gstRate)) {
+        return res.status(400).json({
+          error: `Invalid GST rate: ${gstRate}. Must be one of: ${validGSTRates.join(', ')}`,
+        });
+      }
+
+      // Validate finished goods
+      const finishedGood = await prisma.finishedGood.findUnique({
+        where: { id: finishedGoodId },
+      });
+
+      if (!finishedGood) {
+        return res.status(404).json({ error: `Finished goods not found: ${finishedGoodId}` });
+      }
+
+      if (finishedGood.availableQuantity < quantity) {
+        return res.status(400).json({
+          error: `Insufficient quantity for ${finishedGood.productName}. Available: ${finishedGood.availableQuantity}, Requested: ${quantity}`,
+        });
+      }
+
+      const itemTotal = quantity * pricePerUnit;
+      subtotal += itemTotal;
+
+      // Calculate GST for this item
+      const itemGST = calculateItemGST(itemTotal, gstRate, isIntrastateTransaction);
+      totalCGST += itemGST.cgst;
+      totalSGST += itemGST.sgst;
+      totalIGST += itemGST.igst;
+
+      processedItems.push({
+        finishedGoodId,
+        quantity,
+        pricePerUnit,
+        hsnCode,
+        gstRate,
+        itemTotal,
+      });
+    }
+
+    // Calculate total tax and amount
+    const totalTax = totalCGST + totalSGST + totalIGST;
+    const totalAmount = subtotal + totalTax;
+
+    // Determine the primary GST rate for display (use the highest rate if multiple)
+    const gstRates = processedItems.map(item => item.gstRate).filter((rate, index, self) => self.indexOf(rate) === index);
+    const primaryGSTRate = Math.max(...gstRates);
+
+    // Delete old invoice items
+    await prisma.invoiceItem.deleteMany({
+      where: { invoiceId: id },
+    });
+
+    // Update invoice
+    const invoice = await prisma.invoice.update({
+      where: { id },
+      data: {
+        clientId,
+        invoiceDate: new Date(invoiceDate),
+        dueDate: dueDate ? new Date(dueDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days default
+        items: processedItems,
+        subtotal,
+        taxDetails: {
+          cgst: Math.round(totalCGST * 100) / 100,
+          sgst: Math.round(totalSGST * 100) / 100,
+          igst: Math.round(totalIGST * 100) / 100,
+          totalTax: Math.round(totalTax * 100) / 100,
+          gstRate: primaryGSTRate,
+        },
+        totalAmount,
+        notes: notes || null,
+        companyName: companyName || null,
+        companyAddress: companyAddress || null,
+        companyGstin: companyGstin || null,
+        companyPhone: companyPhone || null,
+      },
+      include: {
+        client: true,
+        creator: {
+          select: { firstName: true, lastName: true, email: true },
+        },
+        invoiceItems: {
+          include: {
+            finishedGood: {
+              include: {
+                batch: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Create new invoice items and update finished goods quantities
+    for (const item of processedItems) {
+      await Promise.all([
+        prisma.invoiceItem.create({
+          data: {
+            invoiceId: id,
+            finishedGoodId: item.finishedGoodId,
+            batchCode: (await prisma.finishedGood.findUnique({
+              where: { id: item.finishedGoodId },
+              include: { batch: true },
+            }))?.batch.batchCode || "",
+            quantity: item.quantity,
+            hsnCode: item.hsnCode,
+            pricePerUnit: item.pricePerUnit,
+          },
+        }),
+        prisma.finishedGood.update({
+          where: { id: item.finishedGoodId },
+          data: {
+            availableQuantity: {
+              decrement: item.quantity,
+            },
+          },
+        }),
+      ]);
+    }
+
+    res.json({
+      message: "Invoice updated successfully",
+      invoice,
+    });
+  } catch (error) {
+    console.error("Error updating invoice:", error);
+    res.status(500).json({ error: "Failed to update invoice" });
+  }
+});
+
+// 5. Update invoice payment status
 router.patch("/:id/payment-status", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -370,7 +601,7 @@ router.patch("/:id/payment-status", authenticateToken, requireRole(["Admin", "Sa
   }
 });
 
-// 5. Generate invoice PDF (placeholder for now)
+// 6. Generate invoice PDF (placeholder for now)
 router.get("/:id/pdf", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -428,7 +659,7 @@ router.get("/:id/pdf", authenticateToken, async (req: Request, res: Response) =>
   }
 });
 
-// 6. Get invoice statistics
+// 7. Get invoice statistics
 router.get("/stats/overview", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
@@ -482,7 +713,7 @@ router.get("/stats/overview", authenticateToken, async (req: Request, res: Respo
   }
 });
 
-// 7. Delete invoice
+// 8. Delete invoice
 router.delete("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

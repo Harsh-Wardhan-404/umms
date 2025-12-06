@@ -21,6 +21,10 @@ interface InvoiceDetails {
   totalAmount: number;
   paymentStatus: string;
   notes: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyGstin?: string;
+  companyPhone?: string;
   client: {
     name: string;
     email: string;
@@ -36,6 +40,7 @@ interface InvoiceDetails {
     batchCode: string;
     finishedGood: {
       productName: string;
+      unit: string;
     };
   }>;
 }
@@ -104,11 +109,16 @@ const InvoicePrint = () => {
               </div> */}
             </div>
             <div className="text-right">
-              <h2 className="text-xl font-bold">Sahyadri Nutraceuticals</h2>
-              <p className="text-sm">123 Business Address</p>
-              <p className="text-sm">City, State - 400001</p>
-              <p className="text-sm">GSTIN: 27AAAAA0000A1Z5</p>
-              <p className="text-sm">Phone: +91-1234567890</p>
+              <h2 className="text-xl font-bold">{invoice.companyName || 'Sahyadri Nutraceuticals'}</h2>
+              {invoice.companyAddress && invoice.companyAddress.split('\n').map((line, idx) => (
+                <p key={idx} className="text-sm">{line}</p>
+              ))}
+              {invoice.companyGstin && (
+                <p className="text-sm">GSTIN: {invoice.companyGstin}</p>
+              )}
+              {invoice.companyPhone && (
+                <p className="text-sm">Phone: {invoice.companyPhone}</p>
+              )}
             </div>
           </div>
         </div>
@@ -182,10 +192,10 @@ const InvoicePrint = () => {
                 <td className="border border-gray-300 p-2">{item.finishedGood.productName}</td>
                 <td className="border border-gray-300 p-2 text-xs font-mono">{item.batchCode}</td>
                 <td className="border border-gray-300 p-2 text-center text-xs font-mono">{item.hsnCode}</td>
-                <td className="border border-gray-300 p-2 text-right">{item.quantity.toFixed(2)}</td>
-                <td className="border border-gray-300 p-2 text-right">{item.pricePerUnit.toFixed(2)}</td>
+                <td className="border border-gray-300 p-2 text-right">{item.quantity.toFixed(2)} {item.finishedGood.unit || 'units'}</td>
+                <td className="border border-gray-300 p-2 text-right">₹{item.pricePerUnit.toFixed(2)}/{item.finishedGood.unit || 'unit'}</td>
                 <td className="border border-gray-300 p-2 text-right font-semibold">
-                  {(item.quantity * item.pricePerUnit).toFixed(2)}
+                  ₹{(item.quantity * item.pricePerUnit).toFixed(2)}
                 </td>
               </tr>
             ))}
@@ -268,7 +278,7 @@ const InvoicePrint = () => {
             <p>Generated on: {new Date().toLocaleString('en-IN')}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-semibold mb-8">For Sahyadri Nutraceuticals</p>
+            <p className="text-sm font-semibold mb-8">For {invoice.companyName || 'Sahyadri Nutraceuticals'}</p>
             <p className="text-sm border-t border-gray-400 pt-1">Authorized Signatory</p>
           </div>
         </div>

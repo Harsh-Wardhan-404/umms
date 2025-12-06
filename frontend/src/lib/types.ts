@@ -141,6 +141,7 @@ export interface FinishedGood {
   productName: string;
   quantityProduced: number;
   availableQuantity: number;
+  unit: string;
   unitPrice: number;
   hsnCode: string;
   qualityStatus: string;

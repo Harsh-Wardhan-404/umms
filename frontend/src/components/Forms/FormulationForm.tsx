@@ -89,6 +89,17 @@ const FormulationForm = ({ type, setOpen }: FormulationFormProps) => {
             setIsSubmitting(true);
             setApiError(null);
 
+            // Validate total composition equals 100%
+            const total = formData.initialIngredients.reduce(
+                (sum, ing) => sum + (parseFloat(String(ing.percentageOrComposition)) || 0),
+                0
+            );
+            if (Math.abs(total - 100) > 0.01) {
+                setApiError(`Total composition must equal 100%. Current total: ${total.toFixed(2)}%`);
+                setIsSubmitting(false);
+                return;
+            }
+
             // Add creatorId from logged-in user
             const requestData = {
                 ...formData,
@@ -162,7 +173,7 @@ const FormulationForm = ({ type, setOpen }: FormulationFormProps) => {
                     </p>
                     {totalPercentage !== 100 && (
                         <p className="text-xs text-yellow-600 mt-1">
-                            Note: Total should equal 100% for accurate formulation
+                            ⚠️ Total must equal 100% to create formulation. Please adjust the composition values.
                         </p>
                     )}
                 </div>

@@ -13,15 +13,16 @@ router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async 
       productName,
       quantityProduced,
       availableQuantity,
+      unit,
       unitPrice,
       hsnCode,
       qualityStatus,
     } = req.body;
 
     // Validate required fields
-    if (!batchId || !productName || !quantityProduced || !availableQuantity || !unitPrice || !hsnCode) {
+    if (!batchId || !productName || !quantityProduced || !availableQuantity || !unit || !unitPrice || !hsnCode) {
       return res.status(400).json({
-        error: "Missing required fields: batchId, productName, quantityProduced, availableQuantity, unitPrice, hsnCode",
+        error: "Missing required fields: batchId, productName, quantityProduced, availableQuantity, unit, unitPrice, hsnCode",
       });
     }
 
@@ -58,6 +59,7 @@ router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async 
         formulationVersionId: batch.formulationVersionId, // Get from batch
         quantityProduced: parseFloat(quantityProduced),
         availableQuantity: parseFloat(availableQuantity),
+        unit: unit || "pieces",
         unitPrice: parseFloat(unitPrice),
         hsnCode,
         qualityStatus: qualityStatus || "Approved",
@@ -188,6 +190,7 @@ router.patch("/:id", authenticateToken, requireRole(["Admin", "Supervisor"]), as
     const { id } = req.params;
     const {
       availableQuantity,
+      unit,
       unitPrice,
       hsnCode,
       qualityStatus,
@@ -195,6 +198,7 @@ router.patch("/:id", authenticateToken, requireRole(["Admin", "Supervisor"]), as
 
     const updateData: any = {};
     if (availableQuantity !== undefined) updateData.availableQuantity = parseFloat(availableQuantity);
+    if (unit) updateData.unit = unit;
     if (unitPrice !== undefined) updateData.unitPrice = parseFloat(unitPrice);
     if (hsnCode) updateData.hsnCode = hsnCode;
     if (qualityStatus) updateData.qualityStatus = qualityStatus;

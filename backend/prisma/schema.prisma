@@ -200,6 +200,7 @@ model FinishedGood {
   formulationVersionId String   @map("formulation_version_id")
   quantityProduced     Float    @map("quantity_produced")
   availableQuantity    Float    @map("available_quantity") // Quantity available for sale
+  unit                 String   @default("units") // Unit of measurement (kg, units, liters, etc.)
   unitPrice            Float    @map("unit_price") // Price per unit
   hsnCode              String   @map("hsn_code") // HSN code for GST
   qualityStatus        String   @default("Approved") @map("quality_status") // Approved, Pending, Rejected
@@ -228,6 +229,10 @@ model Invoice {
   invoicePdfUrl   String?  @map("invoice_pdf_url")
   paymentStatus   String   @default("Pending") @map("payment_status") // Pending, Partial, Paid
   notes           String?  // Additional notes
+  companyName     String?  @map("company_name") // Company name (Piyush nutripharma / Sahyadri Nutraceuticals)
+  companyAddress  String?  @map("company_address")
+  companyGstin    String?  @map("company_gstin")
+  companyPhone    String?  @map("company_phone")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 

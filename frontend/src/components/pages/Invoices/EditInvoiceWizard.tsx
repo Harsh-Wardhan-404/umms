@@ -20,6 +20,7 @@ interface FinishedGood {
     id: string;
     productName: string;
     availableQuantity: number;
+    unit: string;
     unitPrice: number;
     hsnCode: string;
     batch: {
@@ -32,6 +33,7 @@ interface InvoiceItem {
     productName: string;
     batchCode: string;
     quantity: number;
+    unit: string;
     pricePerUnit: number;
     hsnCode: string;
     amount: number;
@@ -52,6 +54,12 @@ const EditInvoiceWizard = () => {
     const [updating, setUpdating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // Company details
+    const [companyName, setCompanyName] = useState('Sahyadri Nutraceuticals');
+    const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
+    const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
+    const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -109,22 +117,29 @@ const EditInvoiceWizard = () => {
             setInvoiceDate(new Date(invoice.invoiceDate).toISOString().split('T')[0]);
             setDueDate(new Date(invoice.dueDate).toISOString().split('T')[0]);
             setNotes(invoice.notes || '');
+            
+            // Load company details
+            setCompanyName(invoice.companyName || 'Sahyadri Nutraceuticals');
+            setCompanyAddress(invoice.companyAddress || '123 Business Address\nCity, State - 400001');
+            setCompanyGstin(invoice.companyGstin || '27AAAAA0000A1Z5');
+            setCompanyPhone(invoice.companyPhone || '+91-1234567890');
 
             // Use invoiceItems instead of items, and get gstRate from the JSON items array
             const jsonItems = invoice.items || [];
-            // Create a map by finishedGoodId for quick lookup, handling multiple items with same ID by using first match
-            const jsonItemsMap = new Map();
-            jsonItems.forEach((item: any, index: number) => {
+            // Create a map by finishedGoodId for quick lookup
+            // Note: We match by finishedGoodId only, not by index, because invoiceItems
+            // from the database may not be in the same order as the JSON items array
+            const jsonItemsMap = new Map<string, any>();
+            jsonItems.forEach((item: any) => {
                 if (item.finishedGoodId && !jsonItemsMap.has(item.finishedGoodId)) {
                     jsonItemsMap.set(item.finishedGoodId, item);
                 }
-                // Also store by index as fallback
-                jsonItemsMap.set(`index_${index}`, item);
             });
 
-            const mappedItems = (invoice.invoiceItems || []).map((item: any, index: number) => {
-                // Try to get gstRate from JSON items array by finishedGoodId first, then by index
-                const jsonItem = jsonItemsMap.get(item.finishedGoodId) || jsonItemsMap.get(`index_${index}`) || jsonItems[index];
+            const mappedItems = (invoice.invoiceItems || []).map((item: any) => {
+                // Match by finishedGoodId only - index-based matching is unsafe due to
+                // potential order mismatch between database records and JSON array
+                const jsonItem = jsonItemsMap.get(item.finishedGoodId);
                 const gstRate = jsonItem?.gstRate ?? (invoice.taxDetails?.gstRate ?? 18);
 
                 const quantity = item.quantity || 0;
@@ -136,6 +151,7 @@ const EditInvoiceWizard = () => {
                     productName: item.finishedGood?.productName || 'Unknown Product',
                     batchCode: item.finishedGood?.batch?.batchCode || item.batchCode || 'Unknown Batch',
                     quantity: quantity,
+                    unit: item.finishedGood?.unit || 'units',
                     pricePerUnit: pricePerUnit,
                     hsnCode: item.hsnCode || '',
                     amount: amount,
@@ -164,6 +180,7 @@ const EditInvoiceWizard = () => {
             productName: good.productName,
             batchCode: good.batch.batchCode,
             quantity: 1,
+            unit: good.unit || 'units',
             pricePerUnit: good.unitPrice,
             hsnCode: good.hsnCode,
             amount: good.unitPrice,
@@ -290,6 +307,10 @@ const EditInvoiceWizard = () => {
             const payload = {
                 clientId: selectedClientId,
                 invoiceDate: new Date(invoiceDate).toISOString(),
+                companyName,
+                companyAddress,
+                companyGstin,
+                companyPhone,
                 dueDate: new Date(dueDate).toISOString(),
                 items: items.map(item => ({
                     finishedGoodId: item.finishedGoodId,
@@ -421,6 +442,72 @@ const EditInvoiceWizard = () => {
                     </div>
                 </div>
 
+                {/* Company Details */}
+                <div className="border border-gray-300 rounded-lg p-6">
+                    <h2 className="text-lg font-semibold mb-4">Company Details</h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold">Company Name *</label>
+                            <select
+                                value={companyName}
+                                onChange={(e) => {
+                                    const selected = e.target.value;
+                                    setCompanyName(selected);
+                                    // Set default values based on company selection
+                                    if (selected === 'Piyush Nutripharma') {
+                                        setCompanyAddress('Piyush Nutripharma Address\nCity, State - PIN');
+                                        setCompanyGstin('27BBBBB0000B1Z6');
+                                        setCompanyPhone('+91-9876543210');
+                                    } else if (selected === 'Sahyadri Nutraceuticals') {
+                                        setCompanyAddress('123 Business Address\nCity, State - 400001');
+                                        setCompanyGstin('27AAAAA0000A1Z5');
+                                        setCompanyPhone('+91-1234567890');
+                                    }
+                                }}
+                                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            >
+                                <option value="Sahyadri Nutraceuticals">Sahyadri Nutraceuticals</option>
+                                <option value="Piyush Nutripharma">Piyush Nutripharma</option>
+                            </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold">Company GSTIN *</label>
+                            <input
+                                type="text"
+                                value={companyGstin}
+                                onChange={(e) => setCompanyGstin(e.target.value)}
+                                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., 27AAAAA0000A1Z5"
+                                required
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-2 lg:col-span-2">
+                            <label className="text-sm font-semibold">Company Address *</label>
+                            <textarea
+                                value={companyAddress}
+                                onChange={(e) => setCompanyAddress(e.target.value)}
+                                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                                placeholder="Enter company address"
+                                required
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold">Company Phone</label>
+                            <input
+                                type="text"
+                                value={companyPhone}
+                                onChange={(e) => setCompanyPhone(e.target.value)}
+                                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., +91-1234567890"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Add Items */}
                 <div className="border border-gray-300 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-4">
@@ -437,7 +524,7 @@ const EditInvoiceWizard = () => {
                             <option value="">+ Add Product</option>
                             {finishedGoods.map(good => (
                                 <option key={good.id} value={good.id}>
-                                    {good.productName} - {good.batch.batchCode} (Avail: {good.availableQuantity})
+                                    {good.productName} - {good.batch.batchCode} (Avail: {good.availableQuantity} {good.unit || 'units'})
                                 </option>
                             ))}
                         </select>
@@ -469,24 +556,30 @@ const EditInvoiceWizard = () => {
                                             <td className="p-3 font-mono text-xs">{item.batchCode}</td>
                                             <td className="p-3 font-mono text-xs">{item.hsnCode}</td>
                                             <td className="p-3">
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    min="0.01"
-                                                    value={item.quantity}
-                                                    onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                                    className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
-                                                />
+                                                <div className="flex items-center gap-1">
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0.01"
+                                                        value={item.quantity}
+                                                        onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                                        className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
+                                                    />
+                                                    <span className="text-xs text-gray-500">{item.unit || 'units'}</span>
+                                                </div>
                                             </td>
                                             <td className="p-3">
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    min="0"
-                                                    value={item.pricePerUnit}
-                                                    onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
-                                                    className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
-                                                />
+                                                <div className="flex items-center gap-1">
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={item.pricePerUnit}
+                                                        onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
+                                                        className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
+                                                    />
+                                                    <span className="text-xs text-gray-500">/{item.unit || 'unit'}</span>
+                                                </div>
                                             </td>
                                             <td className="p-3">
                                                 <select

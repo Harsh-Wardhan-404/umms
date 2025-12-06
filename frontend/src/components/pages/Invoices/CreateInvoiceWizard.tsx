@@ -19,6 +19,7 @@ interface FinishedGood {
   id: string;
   productName: string;
   availableQuantity: number;
+  unit: string;
   unitPrice: number;
   hsnCode: string;
   batch: {
@@ -31,6 +32,7 @@ interface InvoiceItem {
   productName: string;
   batchCode: string;
   quantity: number;
+  unit: string;
   pricePerUnit: number;
   hsnCode: string;
   amount: number;
@@ -49,6 +51,12 @@ const CreateInvoiceWizard = () => {
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Company details
+  const [companyName, setCompanyName] = useState('Sahyadri Nutraceuticals');
+  const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
+  const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
+  const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
 
   useEffect(() => {
     fetchClients();
@@ -102,6 +110,7 @@ const CreateInvoiceWizard = () => {
       productName: good.productName,
       batchCode: good.batch.batchCode,
       quantity: 1,
+      unit: good.unit || 'units',
       pricePerUnit: good.unitPrice,
       hsnCode: good.hsnCode,
       amount: good.unitPrice,
@@ -234,6 +243,10 @@ const CreateInvoiceWizard = () => {
           gstRate: item.gstRate, // Include GST rate per item
         })),
         notes,
+        companyName,
+        companyAddress,
+        companyGstin,
+        companyPhone,
       };
 
       const response = await api.post('/api/invoices', payload);
@@ -362,6 +375,72 @@ const CreateInvoiceWizard = () => {
           </div>
         </div>
 
+        {/* Company Details */}
+        <div className="border border-gray-300 rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Company Details</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Company Name *</label>
+              <select
+                value={companyName}
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  setCompanyName(selected);
+                  // Set default values based on company selection
+                  if (selected === 'Piyush Nutripharma') {
+                    setCompanyAddress('Piyush Nutripharma Address\nCity, State - PIN');
+                    setCompanyGstin('27BBBBB0000B1Z6');
+                    setCompanyPhone('+91-9876543210');
+                  } else if (selected === 'Sahyadri Nutraceuticals') {
+                    setCompanyAddress('123 Business Address\nCity, State - 400001');
+                    setCompanyGstin('27AAAAA0000A1Z5');
+                    setCompanyPhone('+91-1234567890');
+                  }
+                }}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="Sahyadri Nutraceuticals">Sahyadri Nutraceuticals</option>
+                <option value="Piyush Nutripharma">Piyush Nutripharma</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Company GSTIN *</label>
+              <input
+                type="text"
+                value={companyGstin}
+                onChange={(e) => setCompanyGstin(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 27AAAAA0000A1Z5"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-2 lg:col-span-2">
+              <label className="text-sm font-semibold">Company Address *</label>
+              <textarea
+                value={companyAddress}
+                onChange={(e) => setCompanyAddress(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                placeholder="Enter company address"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Company Phone</label>
+              <input
+                type="text"
+                value={companyPhone}
+                onChange={(e) => setCompanyPhone(e.target.value)}
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., +91-1234567890"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Add Items */}
         <div className="border border-gray-300 rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
@@ -378,7 +457,7 @@ const CreateInvoiceWizard = () => {
               <option value="">+ Add Product</option>
               {finishedGoods.map(good => (
                 <option key={good.id} value={good.id}>
-                  {good.productName} - {good.batch.batchCode} (Avail: {good.availableQuantity})
+                  {good.productName} - {good.batch.batchCode} (Avail: {good.availableQuantity} {good.unit || 'units'})
                 </option>
               ))}
             </select>
@@ -410,24 +489,30 @@ const CreateInvoiceWizard = () => {
                       <td className="p-3 font-mono text-xs">{item.batchCode}</td>
                       <td className="p-3 font-mono text-xs">{item.hsnCode}</td>
                       <td className="p-3">
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          value={item.quantity}
-                          onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                          className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
-                        />
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            value={item.quantity}
+                            onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                            className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
+                          />
+                          <span className="text-xs text-gray-500">{item.unit || 'units'}</span>
+                        </div>
                       </td>
                       <td className="p-3">
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={item.pricePerUnit}
-                          onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
-                          className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
-                        />
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={item.pricePerUnit}
+                            onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
+                            className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
+                          />
+                          <span className="text-xs text-gray-500">/{item.unit || 'unit'}</span>
+                        </div>
                       </td>
                       <td className="p-3">
                         <select
