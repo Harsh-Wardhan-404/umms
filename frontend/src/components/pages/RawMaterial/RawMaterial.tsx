@@ -1,4 +1,4 @@
-import { Download, Plus, RefreshCw, AlertTriangle, PackagePlus } from "lucide-react"
+import { Download, Plus, RefreshCw, AlertTriangle, PackagePlus, Eye } from "lucide-react"
 import FormModal from "../_components/FormModal"
 import { useState, useEffect } from "react";
 import Table from "../_components/Table";
@@ -8,6 +8,7 @@ import { categoryBadgeStyles } from "@/lib/utils";
 import clsx from "clsx";
 import api from "@/lib/api";
 import StockUpdateModal from "./StockUpdateModal";
+import MaterialDetailsModal from "./MaterialDetailsModal";
 
 const columns = [
     {
@@ -55,6 +56,10 @@ const RawMaterial = () => {
     const [error, setError] = useState<string | null>(null);
     const [lowStockCount, setLowStockCount] = useState(0);
     const [stockUpdateModal, setStockUpdateModal] = useState<{
+        isOpen: boolean;
+        material: StockManagement | null;
+    }>({ isOpen: false, material: null });
+    const [materialDetailsModal, setMaterialDetailsModal] = useState<{
         isOpen: boolean;
         material: StockManagement | null;
     }>({ isOpen: false, material: null });
@@ -117,6 +122,13 @@ const RawMaterial = () => {
             </td>
             <td className="py-3 px-2">
                 <div className="flex gap-2">
+                    <button
+                        onClick={() => setMaterialDetailsModal({ isOpen: true, material: item })}
+                        className="flex justify-center items-center w-8 h-8 bg-blue-300 border-1 border-blue-500 !text-blue-700 hover:bg-blue-400 rounded-md cursor-pointer group"
+                        title="View Details & Bills"
+                    >
+                        <Eye size={16} />
+                    </button>
                     <button
                         onClick={() => setStockUpdateModal({ isOpen: true, material: item })}
                         className="flex justify-center items-center w-8 h-8 bg-purple-300 border-1 border-purple-500 !text-purple-700 hover:bg-purple-400 rounded-md cursor-pointer group"
@@ -234,6 +246,15 @@ const RawMaterial = () => {
                     unit={stockUpdateModal.material.unit}
                     onClose={() => setStockUpdateModal({ isOpen: false, material: null })}
                     onSuccess={() => fetchMaterials()}
+                />
+            )}
+
+            {/* Material Details Modal */}
+            {materialDetailsModal.material && (
+                <MaterialDetailsModal
+                    isOpen={materialDetailsModal.isOpen}
+                    material={materialDetailsModal.material}
+                    onClose={() => setMaterialDetailsModal({ isOpen: false, material: null })}
                 />
             )}
         </div>
