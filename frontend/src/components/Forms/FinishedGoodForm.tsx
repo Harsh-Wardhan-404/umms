@@ -13,11 +13,13 @@ interface Batch {
   id: string;
   batchCode: string;
   productName: string;
+  batchSize: number;
   status: string;
 }
 
 const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
   const [batches, setBatches] = useState<Batch[]>([]);
+  const [selectedBatchSize, setSelectedBatchSize] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     batchId: data?.batchId || '',
     productName: data?.productName || '',
@@ -53,11 +55,16 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
   const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const batch = batches.find(b => b.id === e.target.value);
     if (batch) {
+      setSelectedBatchSize(batch.batchSize);
       setFormData(prev => ({
         ...prev,
         batchId: batch.id,
         productName: batch.productName,
+        quantityProduced: '', // Reset quantity produced when batch changes
+        availableQuantity: '', // Reset available quantity when batch changes
       }));
+    } else {
+      setSelectedBatchSize(null);
     }
   };
 
@@ -76,10 +83,27 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
       setSubmitting(true);
       setError(null);
 
+      const parsedQuantityProduced = parseFloat(formData.quantityProduced);
+      const parsedAvailableQuantity = parseFloat(formData.availableQuantity);
+
+      // Validate quantity produced doesn't exceed batch size
+      if (type === 'create' && selectedBatchSize !== null && parsedQuantityProduced > selectedBatchSize) {
+        setError(`Quantity produced (${parsedQuantityProduced}) cannot exceed batch size (${selectedBatchSize})`);
+        setSubmitting(false);
+        return;
+      }
+
+      // Validate available quantity doesn't exceed quantity produced
+      if (parsedAvailableQuantity > parsedQuantityProduced) {
+        setError(`Available quantity (${parsedAvailableQuantity}) cannot exceed quantity produced (${parsedQuantityProduced})`);
+        setSubmitting(false);
+        return;
+      }
+
       const payload = {
         ...formData,
-        quantityProduced: parseFloat(formData.quantityProduced),
-        availableQuantity: parseFloat(formData.availableQuantity),
+        quantityProduced: parsedQuantityProduced,
+        availableQuantity: parsedAvailableQuantity,
         unitPrice: parseFloat(formData.unitPrice),
       };
 
@@ -173,11 +197,22 @@ const FinishedGoodForm = ({ setOpen, type, data }: FinishedGoodFormProps) => {
               className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
               min="0"
+              max={selectedBatchSize || undefined}
               placeholder="e.g., 100"
             />
             <p className="text-xs text-gray-500">
               Enter total quantity produced in units (bottles, jars, kg, litres, pieces, etc.)
+              {selectedBatchSize !== null && (
+                <span className="block mt-1 font-semibold text-blue-600">
+                  Maximum allowed: {selectedBatchSize} (Batch Size)
+                </span>
+              )}
             </p>
+            {selectedBatchSize !== null && parseFloat(formData.quantityProduced || '0') > selectedBatchSize && (
+              <p className="text-xs text-red-500">
+                Quantity produced cannot exceed batch size of {selectedBatchSize}
+              </p>
+            )}
           </div>
 
           {/* Unit */}

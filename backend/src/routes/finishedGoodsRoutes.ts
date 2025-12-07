@@ -51,6 +51,22 @@ router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async 
       return res.status(400).json({ error: "Finished goods already exist for this batch" });
     }
 
+    // Validate quantity produced doesn't exceed batch size
+    const parsedQuantityProduced = parseFloat(quantityProduced);
+    if (parsedQuantityProduced > batch.batchSize) {
+      return res.status(400).json({
+        error: `Quantity produced (${parsedQuantityProduced}) cannot exceed batch size (${batch.batchSize})`,
+      });
+    }
+
+    // Validate available quantity doesn't exceed quantity produced
+    const parsedAvailableQuantity = parseFloat(availableQuantity);
+    if (parsedAvailableQuantity > parsedQuantityProduced) {
+      return res.status(400).json({
+        error: `Available quantity (${parsedAvailableQuantity}) cannot exceed quantity produced (${parsedQuantityProduced})`,
+      });
+    }
+
     // Create finished goods entry
     const finishedGood = await prisma.finishedGood.create({
       data: {
