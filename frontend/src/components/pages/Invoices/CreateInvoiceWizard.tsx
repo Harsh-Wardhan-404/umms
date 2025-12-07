@@ -51,13 +51,13 @@ const CreateInvoiceWizard = () => {
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Company details
   const [companyName, setCompanyName] = useState('Sahyadri Nutraceuticals');
   const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
   const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
   const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
-  
+
   // Bank details
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
@@ -68,7 +68,7 @@ const CreateInvoiceWizard = () => {
   useEffect(() => {
     fetchClients();
     fetchFinishedGoods();
-    
+
     // Set default due date to 30 days from now
     const thirtyDaysLater = new Date();
     thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
@@ -154,20 +154,20 @@ const CreateInvoiceWizard = () => {
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
-    const isIntrastateTransaction = selectedClient?.gstNumber 
-      ? selectedClient.gstNumber.substring(0, 2) === '27' 
+    const isIntrastateTransaction = selectedClient?.gstNumber
+      ? selectedClient.gstNumber.substring(0, 2) === '27'
       : false;
 
     // Calculate tax per item and group by GST slab
     const taxBySlab: Record<number, { subtotal: number; cgst: number; sgst: number; igst: number }> = {};
-    
+
     items.forEach(item => {
       if (!taxBySlab[item.gstRate]) {
         taxBySlab[item.gstRate] = { subtotal: 0, cgst: 0, sgst: 0, igst: 0 };
       }
-      
+
       taxBySlab[item.gstRate].subtotal += item.amount;
-      
+
       if (isIntrastateTransaction) {
         // Intrastate: Split GST into CGST and SGST
         taxBySlab[item.gstRate].cgst += (item.amount * item.gstRate) / 200;
@@ -214,7 +214,7 @@ const CreateInvoiceWizard = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedClientId) {
       setError('Please select a client');
       return;
@@ -407,6 +407,10 @@ const CreateInvoiceWizard = () => {
                     setCompanyAddress('123 Business Address\nCity, State - 400001');
                     setCompanyGstin('27AAAAA0000A1Z5');
                     setCompanyPhone('+91-1234567890');
+                  } else if (selected === 'Piyush Nutripharma(Ayurveda)') {
+                    setCompanyAddress('Piyush Nutripharma (Ayurveda) Address\nCity, State - PIN');
+                    setCompanyGstin('27CCCCC0000C1Z7');
+                    setCompanyPhone('+91-1122334455');
                   }
                 }}
                 className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -414,6 +418,7 @@ const CreateInvoiceWizard = () => {
               >
                 <option value="Sahyadri Nutraceuticals">Sahyadri Nutraceuticals</option>
                 <option value="Piyush Nutripharma">Piyush Nutripharma</option>
+                <option value="Piyush Nutripharma(Ayurveda)">Piyush Nutripharma(Ayurveda)</option>
               </select>
             </div>
 
@@ -646,7 +651,7 @@ const CreateInvoiceWizard = () => {
                     .map(([rate, tax]) => {
                       const gstRate = parseFloat(rate);
                       if (gstRate === 0 || (tax.cgst === 0 && tax.sgst === 0 && tax.igst === 0)) return null;
-                      
+
                       return (
                         <div key={rate} className="mb-2 pl-4 border-l-2 border-blue-200">
                           <p className="text-xs font-semibold text-gray-600 mb-1">GST @ {gstRate}% (Subtotal: {formatIndianCurrency(tax.subtotal)})</p>

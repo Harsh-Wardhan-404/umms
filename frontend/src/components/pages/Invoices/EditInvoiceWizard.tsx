@@ -481,6 +481,10 @@ const EditInvoiceWizard = () => {
                                         setCompanyAddress('123 Business Address\nCity, State - 400001');
                                         setCompanyGstin('27AAAAA0000A1Z5');
                                         setCompanyPhone('+91-1234567890');
+                                    } else if (selected === 'Piyush Nutripharma(Ayurveda)') {
+                                        setCompanyAddress('Piyush Nutripharma (Ayurveda) Address\nCity, State - PIN');
+                                        setCompanyGstin('27CCCCC0000C1Z7');
+                                        setCompanyPhone('+91-1122334455');
                                     }
                                 }}
                                 className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -488,6 +492,7 @@ const EditInvoiceWizard = () => {
                             >
                                 <option value="Sahyadri Nutraceuticals">Sahyadri Nutraceuticals</option>
                                 <option value="Piyush Nutripharma">Piyush Nutripharma</option>
+                                <option value="Piyush Nutripharma(Ayurveda)">Piyush Nutripharma(Ayurveda)</option>
                             </select>
                         </div>
 
