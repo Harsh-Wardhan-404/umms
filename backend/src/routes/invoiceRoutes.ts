@@ -5,11 +5,57 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Generate unique invoice number
-function generateInvoiceNumber(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  return `INV-${timestamp.toUpperCase()}-${random.toUpperCase()}`;
+// Generate unique invoice number in format: SN202501001, PN202501001, or PNA202501001
+async function generateInvoiceNumber(companyName: string | null, invoiceDate: Date): Promise<string> {
+  // Determine prefix based on company name
+  let prefix = "SN"; // Default to Sahyadri Nutraceuticals
+  if (companyName) {
+    const nameLower = companyName.toLowerCase();
+    if (nameLower.includes("ayurved")) {
+      prefix = "PNA"; // Piyush Nutripharma(Ayurved)
+    } else if (nameLower.includes("piyush")) {
+      prefix = "PN"; // Piyush Nutripharma
+    }
+  }
+
+  // Get year and month from invoice date
+  const year = invoiceDate.getFullYear();
+  const month = String(invoiceDate.getMonth() + 1).padStart(2, "0");
+
+  // Find the last invoice number for this company/year/month combination
+  const pattern = `${prefix}${year}${month}`;
+  
+  // Get all invoices that match the pattern
+  const matchingInvoices = await prisma.invoice.findMany({
+    where: {
+      invoiceNumber: {
+        startsWith: pattern,
+      },
+    },
+    select: {
+      invoiceNumber: true,
+    },
+    orderBy: {
+      invoiceNumber: "desc",
+    },
+  });
+
+  // Extract the highest invoice number
+  let nextNumber = 1;
+  if (matchingInvoices.length > 0) {
+    // Extract the number part from the last invoice (e.g., "SN202501005" -> 5, "PNA202501005" -> 5)
+    const lastInvoiceNumber = matchingInvoices[0].invoiceNumber;
+    // Pattern is: prefix(2-3) + year(4) + month(2) + number(3)
+    // Extract the last 3 characters as the number
+    const numberPart = lastInvoiceNumber.substring(prefix.length + 6); // Skip prefix + year(4) + month(2)
+    const lastNumber = parseInt(numberPart, 10);
+    if (!isNaN(lastNumber)) {
+      nextNumber = lastNumber + 1;
+    }
+  }
+
+  // Format: SN202501001, PN202501001, or PNA202501001
+  return `${prefix}${year}${month}${String(nextNumber).padStart(3, "0")}`;
 }
 
 // Check if transaction is intrastate (same state) based on GST numbers
@@ -167,10 +213,13 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
     const gstRates = processedItems.map(item => item.gstRate).filter((rate, index, self) => self.indexOf(rate) === index);
     const primaryGSTRate = Math.max(...gstRates);
 
+    // Generate invoice number
+    const invoiceNumber = await generateInvoiceNumber(companyName || null, new Date(invoiceDate));
+
     // Create invoice
     const invoice = await prisma.invoice.create({
       data: {
-        invoiceNumber: generateInvoiceNumber(),
+        invoiceNumber,
         clientId,
         creatorId: req.user!.userId,
         invoiceDate: new Date(invoiceDate),

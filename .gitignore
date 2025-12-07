@@ -8,6 +8,7 @@ lerna-debug.log*
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+imp_todo.md
 
 # Environment variables
 .env
