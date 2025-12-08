@@ -189,6 +189,22 @@ export interface InvoiceItem {
   finishedGood?: FinishedGood;
 }
 
+export interface CompanyProfile {
+  id: string;
+  name: string;
+  address?: string | null;
+  gstin?: string | null;
+  phone?: string | null;
+  bankName?: string | null;
+  bankBranch?: string | null;
+  bankAccountNo?: string | null;
+  bankIfscCode?: string | null;
+  bankUpiId?: string | null;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Dispatch {
   id: string;
   invoiceId: string;

@@ -33,6 +33,7 @@ import ProfitLossForm from "./pages/ProfitLoss/ProfitLossForm";
 import ProfitLossAnalytics from "./pages/ProfitLoss/ProfitLossAnalytics";
 import { useAuth } from "@/contexts/AuthContext";
 import EditInvoiceWizard from "./pages/Invoices/EditInvoiceWizard";
+import CompanySettings from "./pages/Settings/CompanySettings";
 
 const Home = () => {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
@@ -92,6 +93,7 @@ const Home = () => {
                             <Route path="/finance/profit-loss/analytics" element={<ProfitLossAnalytics />} />
                             <Route path="/staff" element={<Staff />} />
                             <Route path="/user/:id" element={<StaffDetails/>} />
+                            <Route path="/settings/company-profiles" element={<CompanySettings />} />
                         </Routes>
                     </div>
                 </div>

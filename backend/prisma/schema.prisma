@@ -250,6 +250,24 @@ model Invoice {
   @@map("invoices")
 }
 
+model CompanyProfile {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  address        String?  @map("address")
+  gstin          String?  @map("gstin")
+  phone          String?  @map("phone")
+  bankName       String?  @map("bank_name")
+  bankBranch     String?  @map("bank_branch")
+  bankAccountNo  String?  @map("bank_account_no")
+  bankIfscCode   String?  @map("bank_ifsc_code")
+  bankUpiId      String?  @map("bank_upi_id")
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("company_profiles")
+}
+
 model InvoiceItem {
   id            String @id @default(cuid())
   invoiceId     String @map("invoice_id")

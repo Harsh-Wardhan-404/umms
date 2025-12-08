@@ -74,6 +74,13 @@ const menuItems: MenuSection[] = [
             { name: "Staff", href: "/staff", icon: User }
         ],
         access: ["Admin", "Inventory Manager"]
+    },
+    {
+        name: "Settings",
+        options: [
+            { name: "Company Profiles", href: "/settings/company-profiles", icon: Cog },
+        ],
+        access: ["Admin", "Inventory Manager"]
     }
 ]
 

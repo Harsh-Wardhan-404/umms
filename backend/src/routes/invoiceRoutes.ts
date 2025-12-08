@@ -213,8 +213,41 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
     const gstRates = processedItems.map(item => item.gstRate).filter((rate, index, self) => self.indexOf(rate) === index);
     const primaryGSTRate = Math.max(...gstRates);
 
+    // Resolve company details (fall back to default profile if not provided)
+    let resolvedCompany = {
+      companyName,
+      companyAddress,
+      companyGstin,
+      companyPhone,
+      bankName,
+      bankBranch,
+      bankAccountNo,
+      bankIfscCode,
+      bankUpiId,
+    };
+
+    if (!resolvedCompany.companyName) {
+      const defaultCompany = await prisma.companyProfile.findFirst({
+        where: { isDefault: true },
+      }) || await prisma.companyProfile.findFirst();
+
+      if (defaultCompany) {
+        resolvedCompany = {
+          companyName: defaultCompany.name,
+          companyAddress: defaultCompany.address || null,
+          companyGstin: defaultCompany.gstin || null,
+          companyPhone: defaultCompany.phone || null,
+          bankName: defaultCompany.bankName || null,
+          bankBranch: defaultCompany.bankBranch || null,
+          bankAccountNo: defaultCompany.bankAccountNo || null,
+          bankIfscCode: defaultCompany.bankIfscCode || null,
+          bankUpiId: defaultCompany.bankUpiId || null,
+        };
+      }
+    }
+
     // Generate invoice number
-    const invoiceNumber = await generateInvoiceNumber(companyName || null, new Date(invoiceDate));
+    const invoiceNumber = await generateInvoiceNumber(resolvedCompany.companyName || null, new Date(invoiceDate));
 
     // Create invoice
     const invoice = await prisma.invoice.create({
@@ -235,15 +268,15 @@ router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req:
         },
         totalAmount,
         notes,
-        companyName: companyName || null,
-        companyAddress: companyAddress || null,
-        companyGstin: companyGstin || null,
-        companyPhone: companyPhone || null,
-        bankName: bankName || null,
-        bankBranch: bankBranch || null,
-        bankAccountNo: bankAccountNo || null,
-        bankIfscCode: bankIfscCode || null,
-        bankUpiId: bankUpiId || null,
+        companyName: resolvedCompany.companyName || null,
+        companyAddress: resolvedCompany.companyAddress || null,
+        companyGstin: resolvedCompany.companyGstin || null,
+        companyPhone: resolvedCompany.companyPhone || null,
+        bankName: resolvedCompany.bankName || null,
+        bankBranch: resolvedCompany.bankBranch || null,
+        bankAccountNo: resolvedCompany.bankAccountNo || null,
+        bankIfscCode: resolvedCompany.bankIfscCode || null,
+        bankUpiId: resolvedCompany.bankUpiId || null,
         paymentStatus: "Pending",
       },
       include: {
@@ -545,6 +578,39 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
     const gstRates = processedItems.map(item => item.gstRate).filter((rate, index, self) => self.indexOf(rate) === index);
     const primaryGSTRate = Math.max(...gstRates);
 
+    // Resolve company details (fall back to default profile if not provided)
+    let resolvedCompany = {
+      companyName,
+      companyAddress,
+      companyGstin,
+      companyPhone,
+      bankName,
+      bankBranch,
+      bankAccountNo,
+      bankIfscCode,
+      bankUpiId,
+    };
+
+    if (!resolvedCompany.companyName) {
+      const defaultCompany = await prisma.companyProfile.findFirst({
+        where: { isDefault: true },
+      }) || await prisma.companyProfile.findFirst();
+
+      if (defaultCompany) {
+        resolvedCompany = {
+          companyName: defaultCompany.name,
+          companyAddress: defaultCompany.address || null,
+          companyGstin: defaultCompany.gstin || null,
+          companyPhone: defaultCompany.phone || null,
+          bankName: defaultCompany.bankName || null,
+          bankBranch: defaultCompany.bankBranch || null,
+          bankAccountNo: defaultCompany.bankAccountNo || null,
+          bankIfscCode: defaultCompany.bankIfscCode || null,
+          bankUpiId: defaultCompany.bankUpiId || null,
+        };
+      }
+    }
+
     // Delete old invoice items
     await prisma.invoiceItem.deleteMany({
       where: { invoiceId: id },
@@ -568,15 +634,15 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
         },
         totalAmount,
         notes: notes || null,
-        companyName: companyName || null,
-        companyAddress: companyAddress || null,
-        companyGstin: companyGstin || null,
-        companyPhone: companyPhone || null,
-        bankName: bankName || null,
-        bankBranch: bankBranch || null,
-        bankAccountNo: bankAccountNo || null,
-        bankIfscCode: bankIfscCode || null,
-        bankUpiId: bankUpiId || null,
+        companyName: resolvedCompany.companyName || null,
+        companyAddress: resolvedCompany.companyAddress || null,
+        companyGstin: resolvedCompany.companyGstin || null,
+        companyPhone: resolvedCompany.companyPhone || null,
+        bankName: resolvedCompany.bankName || null,
+        bankBranch: resolvedCompany.bankBranch || null,
+        bankAccountNo: resolvedCompany.bankAccountNo || null,
+        bankIfscCode: resolvedCompany.bankIfscCode || null,
+        bankUpiId: resolvedCompany.bankUpiId || null,
       },
       include: {
         client: true,

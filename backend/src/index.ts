@@ -16,6 +16,7 @@ import dispatchRoutes from "./routes/dispatchRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
 import workerEfficiencyRoutes from "./routes/workerEfficiencyRoutes";
 import profitLossRoutes from "./routes/profitLossRoutes";
+import companyRoutes from "./routes/companyRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api/dispatches", dispatchRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/worker-efficiency", workerEfficiencyRoutes);
 app.use("/api/profit-loss", profitLossRoutes);
+app.use("/api/company-profiles", companyRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

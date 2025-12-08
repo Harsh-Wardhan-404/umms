@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
 import { formatIndianCurrency, convertToWords } from '@/lib/gstCalculator';
 import Loader from '@/components/Loader/Loader';
+import type { CompanyProfile } from '@/lib/types';
 
 interface Client {
     id: string;
@@ -54,12 +55,14 @@ const EditInvoiceWizard = () => {
     const [updating, setUpdating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [companyProfiles, setCompanyProfiles] = useState<CompanyProfile[]>([]);
+    const [selectedCompanyId, setSelectedCompanyId] = useState<string>('custom');
     
     // Company details
-    const [companyName, setCompanyName] = useState('Sahyadri Nutraceuticals');
-    const [companyAddress, setCompanyAddress] = useState('123 Business Address\nCity, State - 400001');
-    const [companyGstin, setCompanyGstin] = useState('27AAAAA0000A1Z5');
-    const [companyPhone, setCompanyPhone] = useState('+91-1234567890');
+    const [companyName, setCompanyName] = useState('');
+    const [companyAddress, setCompanyAddress] = useState('');
+    const [companyGstin, setCompanyGstin] = useState('');
+    const [companyPhone, setCompanyPhone] = useState('');
     
     // Bank details
     const [bankName, setBankName] = useState('');
@@ -72,7 +75,7 @@ const EditInvoiceWizard = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await Promise.all([fetchClients(), fetchFinishedGoods()]);
+                await Promise.all([fetchClients(), fetchFinishedGoods(), fetchCompanyProfiles()]);
                 if (id) {
                     await fetchInvoiceDetails(id);
                 }
@@ -94,6 +97,15 @@ const EditInvoiceWizard = () => {
         }
     }, [selectedClientId, clients]);
 
+    useEffect(() => {
+        if (!companyName) {
+            setSelectedCompanyId('custom');
+            return;
+        }
+        const match = companyProfiles.find((c) => c.name === companyName);
+        setSelectedCompanyId(match ? match.id : 'custom');
+    }, [companyName, companyProfiles]);
+
     const fetchClients = async () => {
         try {
             const response = await api.get('/api/clients', { params: { isActive: 'true' } });
@@ -114,6 +126,28 @@ const EditInvoiceWizard = () => {
         }
     };
 
+    const applyCompanyProfile = (profile: CompanyProfile) => {
+        setCompanyName(profile.name || '');
+        setCompanyAddress(profile.address || '');
+        setCompanyGstin(profile.gstin || '');
+        setCompanyPhone(profile.phone || '');
+        setBankName(profile.bankName || '');
+        setBankBranch(profile.bankBranch || '');
+        setBankAccountNo(profile.bankAccountNo || '');
+        setBankIfscCode(profile.bankIfscCode || '');
+        setBankUpiId(profile.bankUpiId || '');
+    };
+
+    const fetchCompanyProfiles = async () => {
+        try {
+            const res = await api.get('/api/company-profiles');
+            const companies: CompanyProfile[] = res.data.companies || [];
+            setCompanyProfiles(companies);
+        } catch (err) {
+            console.error('Error fetching company profiles:', err);
+        }
+    };
+
     const fetchInvoiceDetails = async (invoiceId: string) => {
         try {
             const response = await api.get(`/api/invoices/${invoiceId}`);
@@ -126,10 +160,10 @@ const EditInvoiceWizard = () => {
             setNotes(invoice.notes || '');
             
             // Load company details
-            setCompanyName(invoice.companyName || 'Sahyadri Nutraceuticals');
-            setCompanyAddress(invoice.companyAddress || '123 Business Address\nCity, State - 400001');
-            setCompanyGstin(invoice.companyGstin || '27AAAAA0000A1Z5');
-            setCompanyPhone(invoice.companyPhone || '+91-1234567890');
+            setCompanyName(invoice.companyName || '');
+            setCompanyAddress(invoice.companyAddress || '');
+            setCompanyGstin(invoice.companyGstin || '');
+            setCompanyPhone(invoice.companyPhone || '');
             
             // Load bank details
             setBankName(invoice.bankName || '');
@@ -137,6 +171,16 @@ const EditInvoiceWizard = () => {
             setBankAccountNo(invoice.bankAccountNo || '');
             setBankIfscCode(invoice.bankIfscCode || '');
             setBankUpiId(invoice.bankUpiId || '');
+
+            // Set company selection if it matches an existing profile
+            if (invoice.companyName && companyProfiles.length > 0) {
+                const match = companyProfiles.find((c) => c.name === invoice.companyName);
+                if (match) {
+                    setSelectedCompanyId(match.id);
+                } else {
+                    setSelectedCompanyId('custom');
+                }
+            }
 
             // Use invoiceItems instead of items, and get gstRate from the JSON items array
             const jsonItems = invoice.items || [];
@@ -466,34 +510,41 @@ const EditInvoiceWizard = () => {
                     <h2 className="text-lg font-semibold mb-4">Company Details</h2>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold">Company Name *</label>
+                            <label className="text-sm font-semibold">Saved Company Profile</label>
                             <select
-                                value={companyName}
+                                value={selectedCompanyId || 'custom'}
                                 onChange={(e) => {
                                     const selected = e.target.value;
-                                    setCompanyName(selected);
-                                    // Set default values based on company selection
-                                    if (selected === 'Piyush Nutripharma') {
-                                        setCompanyAddress('Piyush Nutripharma Address\nCity, State - PIN');
-                                        setCompanyGstin('27BBBBB0000B1Z6');
-                                        setCompanyPhone('+91-9876543210');
-                                    } else if (selected === 'Sahyadri Nutraceuticals') {
-                                        setCompanyAddress('123 Business Address\nCity, State - 400001');
-                                        setCompanyGstin('27AAAAA0000A1Z5');
-                                        setCompanyPhone('+91-1234567890');
-                                    } else if (selected === 'Piyush Nutripharma(Ayurved)') {
-                                        setCompanyAddress('Piyush Nutripharma (Ayurved) Address\nCity, State - PIN');
-                                        setCompanyGstin('27CCCCC0000C1Z7');
-                                        setCompanyPhone('+91-1122334455');
+                                    setSelectedCompanyId(selected);
+                                    if (selected === 'custom') {
+                                        return;
+                                    }
+                                    const profile = companyProfiles.find((c) => c.id === selected);
+                                    if (profile) {
+                                        applyCompanyProfile(profile);
                                     }
                                 }}
                                 className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
                             >
-                                <option value="Sahyadri Nutraceuticals">Sahyadri Nutraceuticals</option>
-                                <option value="Piyush Nutripharma">Piyush Nutripharma</option>
-                                <option value="Piyush Nutripharma(Ayurved)">Piyush Nutripharma(Ayurved)</option>
+                                {companyProfiles.map((company) => (
+                                    <option key={company.id} value={company.id}>
+                                        {company.name}{company.isDefault ? ' (Default)' : ''}
+                                    </option>
+                                ))}
+                                <option value="custom">Custom</option>
                             </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold">Company Name *</label>
+                            <input
+                                type="text"
+                                value={companyName}
+                                onChange={(e) => setCompanyName(e.target.value)}
+                                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter company name"
+                                required
+                            />
                         </div>
 
                         <div className="flex flex-col gap-2">
