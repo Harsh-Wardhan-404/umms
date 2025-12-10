@@ -158,7 +158,7 @@ const EditInvoiceWizard = () => {
             setInvoiceDate(new Date(invoice.invoiceDate).toISOString().split('T')[0]);
             setDueDate(new Date(invoice.dueDate).toISOString().split('T')[0]);
             setNotes(invoice.notes || '');
-            
+
             // Load company details
             setCompanyName(invoice.companyName || '');
             setCompanyAddress(invoice.companyAddress || '');
@@ -205,8 +205,8 @@ const EditInvoiceWizard = () => {
                 const amount = quantity * pricePerUnit;
 
                 return {
-                    finishedGoodId: item.finishedGoodId,
-                    productName: item.finishedGood?.productName || 'Unknown Product',
+                finishedGoodId: item.finishedGoodId,
+                productName: item.finishedGood?.productName || 'Unknown Product',
                     batchCode: item.finishedGood?.batch?.batchCode || item.batchCode || 'Unknown Batch',
                     quantity: quantity,
                     unit: item.finishedGood?.unit || 'units',
@@ -632,27 +632,27 @@ const EditInvoiceWizard = () => {
                                             <td className="p-3 font-mono text-xs">{item.hsnCode}</td>
                                             <td className="p-3">
                                                 <div className="flex items-center gap-1">
-                                                    <input
-                                                        type="number"
-                                                        step="0.01"
-                                                        min="0.01"
-                                                        value={item.quantity}
-                                                        onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                                        className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
-                                                    />
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0.01"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                                    className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
+                                                />
                                                     <span className="text-xs text-gray-500">{item.unit || 'units'}</span>
                                                 </div>
                                             </td>
                                             <td className="p-3">
                                                 <div className="flex items-center gap-1">
-                                                    <input
-                                                        type="number"
-                                                        step="0.01"
-                                                        min="0"
-                                                        value={item.pricePerUnit}
-                                                        onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
-                                                        className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
-                                                    />
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    value={item.pricePerUnit}
+                                                    onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
+                                                    className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
+                                                />
                                                     <span className="text-xs text-gray-500">/{item.unit || 'unit'}</span>
                                                 </div>
                                             </td>

@@ -144,19 +144,19 @@ const KeyPerformanceIndicators = () => {
       <h2 className="text-xl font-bold">Key Performance Indicators</h2>
       {/* Primary Cards Section */}
       {primaryCards.length > 0 && (
-        <div className='flex justify-between gap-3 flex-wrap'>
+      <div className='flex justify-between gap-3 flex-wrap'>
           {primaryCards.map((card) => (
-            <Cards key={card.id} title={card.title} metric={card.metric} icon={card.icon} change={card.change} type='primary' />
-          ))}
-        </div>
+          <Cards key={card.id} title={card.title} metric={card.metric} icon={card.icon} change={card.change} type='primary' />
+        ))}
+      </div>
       )}
       {/* Secondary Cards Section */}
       {secondaryCards.length > 0 && (
-        <div className='flex justify-between gap-3 flex-wrap'>
+      <div className='flex justify-between gap-3 flex-wrap'>
           {secondaryCards.map((card) => (
-            <Cards key={card.id} title={card.title} metric={card.metric} icon={card.icon} type='secondary' />
-          ))}
-        </div>
+          <Cards key={card.id} title={card.title} metric={card.metric} icon={card.icon} type='secondary' />
+        ))}
+      </div>
       )}
     </div>
   )

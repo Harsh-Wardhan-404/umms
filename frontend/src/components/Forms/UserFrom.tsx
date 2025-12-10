@@ -173,14 +173,15 @@ const UserForm = ({
                 </div>
             )}
 
-            <div className="flex justify-between flex-wrap gap-4">
-                <div className="flex flex-col gap-2 w-full md:w-[30%]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-2">
                     <InputField
                         label="Username"
                         register={register}
                         name="username"
                         defaultValue={data?.username}
                         err={errors.username as any}
+                        containerClassName="w-full"
                     />
                     {usernameCheckLoading && (
                         <p className="text-xs text-blue-500">Checking availability...</p>
@@ -193,19 +194,21 @@ const UserForm = ({
                     )}
                 </div>
                 <InputField
-                    label="email"
+                    label="Email"
                     register={register}
                     name="email"
                     defaultValue={data?.email}
-                        err={errors.email as any}
+                    err={errors.email as any}
+                    containerClassName="w-full"
                 />
-                <div className="flex flex-col gap-2 w-full md:w-[30%]">
+                <div className="flex flex-col gap-2">
                     <InputField
                         label={type === "update" ? "Password (leave blank to keep current)" : "Password"}
                         register={register}
                         name="password"
                         err={(errors as any).password}
                         type="password"
+                        containerClassName="w-full"
                     />
                     {type === "create" && (
                         <p className="text-xs text-gray-500">Minimum 6 characters required</p>
@@ -215,20 +218,20 @@ const UserForm = ({
                     )}
                 </div>
             </div>
-            <div className='flex justify-between gap-3'>
-                <div className='flex flex-col flex-1'>
-                    <label htmlFor="firstName" className='text-xs text-gray-400'>First Name</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                    <label htmlFor="firstName" className="text-xs text-gray-400">First Name</label>
                     <input {...register('firstName')} className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" />
-                    {errors.firstName?.message && <p className='text-red-500'>{String(errors.firstName?.message)}</p>}
+                    {errors.firstName?.message && <p className="text-red-500 text-xs">{String(errors.firstName?.message)}</p>}
                 </div>
 
-                <div className='flex flex-col flex-1'>
-                    <label htmlFor="lastName" className='text-xs text-gray-400'>Last Name</label>
+                <div className="flex flex-col">
+                    <label htmlFor="lastName" className="text-xs text-gray-400">Last Name</label>
                     <input {...register('lastName')} className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" />
-                    {errors.lastName?.message && <p className='text-red-500'>{String(errors.lastName?.message)}</p>}
+                    {errors.lastName?.message && <p className="text-red-500 text-xs">{String(errors.lastName?.message)}</p>}
                 </div>
             </div>
-            <div className="flex flex-col gap-2 w-full md:w-1/4">
+            <div className="flex flex-col gap-2 w-full md:w-1/3 min-w-[200px]">
                 <label className="text-xs text-gray-400">Role</label>
                 <select
                     className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"

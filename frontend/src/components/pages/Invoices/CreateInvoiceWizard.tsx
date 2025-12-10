@@ -72,7 +72,7 @@ const CreateInvoiceWizard = () => {
     fetchClients();
     fetchFinishedGoods();
     fetchCompanyProfiles();
-
+    
     // Set default due date to 30 days from now
     const thirtyDaysLater = new Date();
     thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
@@ -164,8 +164,8 @@ const CreateInvoiceWizard = () => {
     if (field === 'gstRate') {
       updatedItems[index].gstRate = value;
     } else {
-      updatedItems[index][field] = value;
-      updatedItems[index].amount = updatedItems[index].quantity * updatedItems[index].pricePerUnit;
+    updatedItems[index][field] = value;
+    updatedItems[index].amount = updatedItems[index].quantity * updatedItems[index].pricePerUnit;
     }
     setItems(updatedItems);
   };
@@ -245,7 +245,7 @@ const CreateInvoiceWizard = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!selectedClientId) {
       setError('Please select a client');
       return;
@@ -616,27 +616,27 @@ const CreateInvoiceWizard = () => {
                       <td className="p-3 font-mono text-xs">{item.hsnCode}</td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            value={item.quantity}
-                            onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                            className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
-                          />
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          value={item.quantity}
+                          onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="border border-gray-300 rounded px-2 py-1 w-20 text-right"
+                        />
                           <span className="text-xs text-gray-500">{item.unit || 'units'}</span>
                         </div>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={item.pricePerUnit}
-                            onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
-                            className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
-                          />
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.pricePerUnit}
+                          onChange={(e) => handleUpdateItem(index, 'pricePerUnit', parseFloat(e.target.value) || 0)}
+                          className="border border-gray-300 rounded px-2 py-1 w-24 text-right"
+                        />
                           <span className="text-xs text-gray-500">/{item.unit || 'unit'}</span>
                         </div>
                       </td>
@@ -728,23 +728,23 @@ const CreateInvoiceWizard = () => {
 
               {/* Total Tax Summary */}
               <div className="border-t border-gray-300 pt-2 mt-2">
-                {totals.isIntrastate ? (
-                  <>
-                    <div className="flex justify-between">
+              {totals.isIntrastate ? (
+                <>
+                  <div className="flex justify-between">
                       <span className="font-semibold">Total CGST:</span>
                       <span className="font-semibold">{formatIndianCurrency(totals.cgst)}</span>
-                    </div>
-                    <div className="flex justify-between">
+                  </div>
+                  <div className="flex justify-between">
                       <span className="font-semibold">Total SGST:</span>
                       <span className="font-semibold">{formatIndianCurrency(totals.sgst)}</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex justify-between">
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-between">
                     <span className="font-semibold">Total IGST:</span>
                     <span className="font-semibold">{formatIndianCurrency(totals.igst)}</span>
-                  </div>
-                )}
+                </div>
+              )}
               </div>
 
               <div className="border-t-2 border-gray-400 pt-2 mt-2">

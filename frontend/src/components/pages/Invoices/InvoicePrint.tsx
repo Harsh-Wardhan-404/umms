@@ -175,8 +175,8 @@ const InvoicePrint = () => {
       <div ref={invoiceRef} className="max-w-[210mm] mx-auto p-8 print:p-0 bg-white" style={{ fontFamily: 'Arial, sans-serif' }}>
         {/* Header - TAX INVOICE Title */}
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">TAX INVOICE</h1>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">TAX INVOICE</h1>
           </div>
           <div className="text-right text-sm text-gray-600">
             <p>ORIGINAL FOR RECIPIENT</p>
@@ -192,8 +192,8 @@ const InvoicePrint = () => {
               className="h-20 w-auto"
               style={{ maxHeight: '80px', objectFit: 'contain' }}
             />
-          </div>
-          <div className="text-right">
+            </div>
+            <div className="text-right">
             <h2 className="text-xl font-bold">{invoice.companyName || 'Sahyadri Nutraceuticals'}</h2>
             {invoice.companyAddress && invoice.companyAddress.split('\n').map((line, idx) => (
               <p key={idx} className="text-sm">{line}</p>
@@ -301,8 +301,8 @@ const InvoicePrint = () => {
           {/* Tax Summary */}
           <div className="border border-gray-300 p-4 rounded">
             <div className="space-y-2 text-sm">
-              {isIntrastateTxn ? (
-                <>
+                {isIntrastateTxn ? (
+                  <>
                   <div className="flex justify-between">
                     <span>CGST Amt:</span>
                     <span className="font-semibold">₹{invoice.taxDetails.cgst.toFixed(2)}</span>
@@ -315,8 +315,8 @@ const InvoicePrint = () => {
                     <span>IGST Amt:</span>
                     <span>-</span>
                   </div>
-                </>
-              ) : (
+                  </>
+                ) : (
                 <>
                   <div className="flex justify-between">
                     <span>CGST Amt:</span>
@@ -331,7 +331,7 @@ const InvoicePrint = () => {
                     <span className="font-semibold">₹{invoice.taxDetails.igst.toFixed(2)}</span>
                   </div>
                 </>
-              )}
+                )}
               <div className="flex justify-between border-t border-gray-300 pt-2">
                 <span>Freight Packing Charges:</span>
                 <span>-</span>
@@ -379,12 +379,12 @@ const InvoicePrint = () => {
         {/* Declaration */}
         <div className="border border-gray-300 p-4 rounded mb-6 text-xs">
           <p className="font-bold mb-2">Declaration:</p>
-          <ul className="list-disc list-inside space-y-1">
+            <ul className="list-disc list-inside space-y-1">
             <li>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.</li>
             <li>Subject to jurisdiction of courts in [State] only.</li>
             <li>Goods once sold will not be taken back or exchanged.</li>
-          </ul>
-        </div>
+            </ul>
+          </div>
 
         {/* Footer with Signature */}
         <div className="border-t-2 border-gray-800 pt-4 flex justify-end items-end">

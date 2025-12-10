@@ -64,14 +64,14 @@ const CriticalAlerts = () => {
             {alerts.length === 0 ? (
                 <p className="text-sm text-gray-600 dark:text-gray-400">No critical alerts at this time.</p>
             ) : (
-                <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
                     {alerts.map((alert) => (
                         <div key={alert.materialId} className="flex justify-between px-2 py-4 bg-red-200 border-l-4 border-red-600 rounded-md">
-                            <p className="text-md font-semibold text-black">{alert.message}</p>
-                            <span className="text-xs text-gray-800">{new Date().toLocaleTimeString()}</span>
-                        </div>
-                    ))}
-                </div>
+                        <p className="text-md font-semibold text-black">{alert.message}</p>
+                        <span className="text-xs text-gray-800">{new Date().toLocaleTimeString()}</span>
+                    </div>
+                ))}
+            </div>
             )}
         </div>
     )

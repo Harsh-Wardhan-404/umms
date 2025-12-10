@@ -236,9 +236,9 @@ const DispatchForm = ({ setOpen, type, data }: DispatchFormProps) => {
                   <option value="" disabled>No available invoices (all may have dispatches already)</option>
                 ) : (
                   invoices.map(invoice => (
-                    <option key={invoice.id} value={invoice.id}>
+                  <option key={invoice.id} value={invoice.id}>
                       {invoice.invoiceNumber} - {invoice.client.name} - ₹{invoice.totalAmount.toFixed(2)} {invoice.paymentStatus ? `(${invoice.paymentStatus})` : ''}
-                    </option>
+                  </option>
                   ))
                 )}
               </select>

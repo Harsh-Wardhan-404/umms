@@ -77,7 +77,7 @@ if (fs.existsSync(frontendDistPath)) {
   });
 } else {
   // If frontend dist doesn't exist, just return 404 for non-API routes
-  app.use("*", (req, res) => {
+app.use("*", (req, res) => {
     if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
       return res.status(404).json({ error: "Route not found" });
     }
@@ -85,7 +85,7 @@ if (fs.existsSync(frontendDistPath)) {
       error: "Route not found",
       message: "Frontend not built. Run 'npm run build' in the frontend directory."
     });
-  });
+});
 }
 
 const PORT = process.env.PORT || 3000;
