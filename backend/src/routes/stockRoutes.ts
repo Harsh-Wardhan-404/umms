@@ -34,7 +34,7 @@ const upload = multer({
 });
 
 // 1. Add new raw materials with supplier details
-router.post("/materials", async (req, res) => {
+router.post("/materials", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req, res) => {
   try {
     // const {
     //   name,
@@ -115,7 +115,7 @@ router.post("/materials", async (req, res) => {
 });
 
 // 2. Upload scanned purchase bills
-router.post("/materials/:materialId/upload-bill", upload.single("bill"), async (req, res) => {
+router.post("/materials/:materialId/upload-bill", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), upload.single("bill"), async (req, res) => {
   try {
     const { materialId } = req.params;
     const { billNumber } = req.body;
@@ -253,7 +253,7 @@ router.get("/materials/:materialId", async (req, res) => {
 });
 
 // 5. Update stock quantity
-router.patch("/materials/:materialId/stock", async (req, res) => {
+router.patch("/materials/:materialId/stock", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req, res) => {
   try {
     const { materialId } = req.params;
     const { quantity, operation, notes } = req.body; // operation: 'add' or 'subtract'
@@ -389,7 +389,7 @@ router.get("/alerts/low-stock", async (req, res) => {
 });
 
 // 8. Delete material
-router.delete("/materials/:materialId", authenticateToken, requireRole(["Admin", "InventoryManager"]), async (req, res) => {
+router.delete("/materials/:materialId", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req, res) => {
   try {
     const { materialId } = req.params;
 

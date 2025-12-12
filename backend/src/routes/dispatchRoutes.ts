@@ -455,7 +455,7 @@ router.patch("/:id", authenticateToken, requireManager, async (req, res) => {
 });
 
 // Delete dispatch
-router.delete("/:id", authenticateToken, requireAdmin, async (req, res) => {
+router.delete("/:id", authenticateToken, requireManager, async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -38,15 +38,13 @@ const WorkerShiftSelector = ({ formData, updateFormData, onNext, onBack }: Worke
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/users');
-      // Filter for Staff and Supervisor roles
-      const workers = response.data.users.filter((u: User) =>
-        ['Staff', 'Supervisor'].includes(u.role)
-      );
-      setUsers(workers);
+      setError(null);
+      // Use the workers endpoint which is accessible to Supervisors and Production Managers
+      const response = await api.get('/api/users/workers');
+      setUsers(response.data.workers || []);
     } catch (err: any) {
       console.error('Error fetching users:', err);
-      setError(err.response?.data?.error || 'Failed to fetch users');
+      setError(err.response?.data?.error || 'Failed to fetch workers');
     } finally {
       setLoading(false);
     }

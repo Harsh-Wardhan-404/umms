@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import Cards from '../../_Components/Cards'
 import api from '@/lib/api'
+import { HomeContext } from '../../../HomeContext'
 import {
   AlertCircle,
   Box,
@@ -21,6 +22,7 @@ interface KPIData {
 }
 
 const KeyPerformanceIndicators = () => {
+  const { Role } = useContext(HomeContext)
   const [kpiData, setKpiData] = useState<KPIData>({
     profitMargin: 0,
     rawMaterials: 0,
@@ -34,21 +36,36 @@ const KeyPerformanceIndicators = () => {
   useEffect(() => {
     const fetchKPIData = async () => {
       try {
+        // Only fetch users if Admin role
+        const isAdmin = Role === "Admin"
+        
+        const apiCalls: Promise<any>[] = [
+          api.get("/api/stock/materials?type=Raw"),
+          api.get("/api/stock/alerts/low-stock"),
+          api.get("/api/batches/stats/overview"),
+          api.get("/api/formulations"),
+          api.get("/api/profit-loss/analytics/summary"),
+        ]
+
+        // Add users API call only for Admin
+        if (isAdmin) {
+          apiCalls.splice(4, 0, api.get("/api/users"))
+        }
+
+        const results = await Promise.allSettled(apiCalls)
+        
+        // Extract results based on whether users API was called
         const [
           stockRes,
           lowStockRes,
           batchStatsRes,
           formulationsRes,
-          usersRes,
           profitLossRes,
-        ] = await Promise.allSettled([
-          api.get("/api/stock/materials?type=Raw"),
-          api.get("/api/stock/alerts/low-stock"),
-          api.get("/api/batches/stats/overview"),
-          api.get("/api/formulations"),
-          api.get("/api/users"),
-          api.get("/api/profit-loss/analytics/summary"),
-        ])
+        ] = isAdmin 
+          ? [results[0], results[1], results[2], results[3], results[5]]
+          : [results[0], results[1], results[2], results[3], results[4]]
+        
+        const usersRes = isAdmin ? results[4] : { status: 'skipped' as const, value: null }
 
         const data: KPIData = {
           profitMargin: 0,
@@ -87,18 +104,15 @@ const KeyPerformanceIndicators = () => {
           console.error("Failed to fetch formulations:", formulationsRes.reason?.response?.data || formulationsRes.reason?.message)
         }
 
-        // System Users count
-        if (usersRes.status === 'fulfilled') {
+        // System Users count (only for Admin)
+        if (usersRes.status === 'fulfilled' && usersRes.value.data) {
           data.systemUsers = usersRes.value.data.pagination?.total || usersRes.value.data.users?.length || 0
-        } else {
+        } else if (usersRes.status === 'rejected' && Role === "Admin") {
+          // Only log error if Admin (shouldn't happen, but log for debugging)
           const error = usersRes.reason?.response?.data || usersRes.reason?.message || usersRes.reason
           console.error("Failed to fetch users:", error)
-          console.error("Users API error details:", {
-            status: usersRes.reason?.response?.status,
-            statusText: usersRes.reason?.response?.statusText,
-            data: usersRes.reason?.response?.data
-          })
         }
+        // For non-Admin users, silently skip (usersRes.status will be 'fulfilled' with skipped status)
 
         // Profit Margin from P&L summary
         if (profitLossRes.status === 'fulfilled') {
@@ -116,7 +130,7 @@ const KeyPerformanceIndicators = () => {
     }
 
     fetchKPIData()
-  }, [])
+  }, [Role])
 
   if (loading) {
     return (

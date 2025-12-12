@@ -24,7 +24,7 @@ const menuItems: MenuSection[] = [
         options: [
             { name: "Dashboard", href: "/", icon: LayoutDashboard },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor", "Staff", "Client"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor", "Staff", "Client"]
     },
     {
         name: "Inventory & Management",
@@ -32,7 +32,7 @@ const menuItems: MenuSection[] = [
             { name: "Inventory", href: "/inventory/inventory", icon: Box },
             // { name: "Suppliers", href: "/inventory/suppliers", icon: Package }, // Hidden - empty page
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Production",
@@ -41,7 +41,7 @@ const menuItems: MenuSection[] = [
             { name: "Batch Production", href: "/production/batch-production", icon: ClipboardList },
             // { name: "Quality Control", href: "/production/quality-control", icon: CheckCircle }, // Hidden - empty page
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Sales & Billing",
@@ -51,14 +51,14 @@ const menuItems: MenuSection[] = [
             { name: "Invoices", href: "/sales/invoices", icon: FileText },
             { name: "Dispatches", href: "/sales/dispatches", icon: Truck },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Performance",
         options: [
             { name: "Worker Efficiency", href: "/performance/workers", icon: TrendingUp },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Finance",
@@ -66,7 +66,7 @@ const menuItems: MenuSection[] = [
             { name: "Profit & Loss", href: "/finance/profit-loss", icon: TrendingUp },
             { name: "Analytics", href: "/finance/profit-loss/analytics", icon: BarChart3 },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Administration",
@@ -80,7 +80,7 @@ const menuItems: MenuSection[] = [
         options: [
             { name: "Company Profiles", href: "/settings/company-profiles", icon: Cog },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     }
 ]
 

@@ -6,6 +6,39 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 const router = Router();
 const prisma = new PrismaClient();
 
+// Get workers (Staff role only) - Available to Admin, ProductionManager, and Supervisor
+router.get("/workers", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor"]), async (req, res) => {
+  try {
+    const workers = await prisma.user.findMany({
+      where: {
+        role: "Staff",
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+      },
+      orderBy: [
+        { firstName: "asc" },
+        { lastName: "asc" },
+      ],
+    });
+
+    res.json({
+      workers,
+    });
+  } catch (error) {
+    console.error("Get workers error:", error);
+    res.status(500).json({
+      error: "Failed to fetch workers",
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+
 // Get all users (Admin only)
 router.get("/", authenticateToken, requireRole(["Admin"]), async (req, res) => {
   try {

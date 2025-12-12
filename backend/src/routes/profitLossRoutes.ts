@@ -30,7 +30,7 @@ function getFirstDayOfMonth(year: number, month: number): Date {
 router.get(
   "/",
   authenticateToken,
-  requireRole(["Admin", "ProductionManager"]),
+  requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]),
   async (req: Request, res: Response) => {
     try {
       const {
@@ -89,7 +89,7 @@ router.get(
 router.get(
   "/analytics/summary",
   authenticateToken,
-  requireRole(["Admin", "ProductionManager"]),
+  requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]),
   async (req: Request, res: Response) => {
     try {
       const summary = await getSummaryStats();
@@ -105,7 +105,7 @@ router.get(
 router.get(
   "/analytics/comparison",
   authenticateToken,
-  requireRole(["Admin", "ProductionManager"]),
+  requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]),
   async (req: Request, res: Response) => {
     try {
       const { type = "monthly", periods = "6" } = req.query;
@@ -186,7 +186,7 @@ router.get(
 router.get(
   "/month/:yearMonth",
   authenticateToken,
-  requireRole(["Admin", "ProductionManager"]),
+  requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]),
   async (req: Request, res: Response) => {
     try {
       const { yearMonth } = req.params;
@@ -223,7 +223,7 @@ router.get(
 router.get(
   "/:id",
   authenticateToken,
-  requireRole(["Admin", "ProductionManager"]),
+  requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]),
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;

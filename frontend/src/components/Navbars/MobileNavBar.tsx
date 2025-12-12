@@ -14,7 +14,7 @@ const menuItems: MenuSection[] = [
         options: [
             { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor", "Staff", "Client"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor", "Staff", "Client"]
     },
     {
         name: "Inventory & Management",
@@ -22,7 +22,7 @@ const menuItems: MenuSection[] = [
             { name: "Raw Materials", href: "/inventory/raw-materials", icon: Box },
             // { name: "Suppliers", href: "/inventory/suppliers", icon: Package }, // Hidden - empty page
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Production",
@@ -31,7 +31,7 @@ const menuItems: MenuSection[] = [
             { name: "Batch Production", href: "/production/batch-production", icon: ClipboardList },
             // { name: "Quality Control", href: "/production/quality-control", icon: CheckCircle }, // Hidden - empty page
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Business Operations",
@@ -40,7 +40,7 @@ const menuItems: MenuSection[] = [
             { name: "Financial Management", href: "/business-operations/financial-management", icon: Users },
             { name: "Client Management", href: "/business-operations/client-management", icon: User },
         ],
-        access: ["Admin", "Production Manager", "Inventory Manager", "Supervisor"]
+        access: ["Admin", "ProductionManager", "InventoryManager", "Supervisor"]
     },
     {
         name: "Administration",

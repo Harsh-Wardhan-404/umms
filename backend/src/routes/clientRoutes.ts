@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // 1. Create new client
-router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.post("/", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const {
       name,
@@ -157,7 +157,7 @@ router.get("/:id", authenticateToken, async (req: Request, res: Response) => {
 });
 
 // 4. Update client
-router.patch("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.patch("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const {
@@ -201,7 +201,7 @@ router.patch("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (
 });
 
 // 5. Delete client (soft delete by setting isActive to false)
-router.delete("/:id", authenticateToken, requireRole(["Admin"]), async (req: Request, res: Response) => {
+router.delete("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 

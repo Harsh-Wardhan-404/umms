@@ -100,7 +100,7 @@ function calculateItemGST(amount: number, gstRate: number, isIntrastateTransacti
 }
 
 // 1. Create new invoice
-router.post("/", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.post("/", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const {
       clientId,
@@ -432,7 +432,7 @@ router.get("/:id", authenticateToken, async (req: Request, res: Response) => {
 });
 
 // 4. Update invoice
-router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.put("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const {
@@ -696,7 +696,7 @@ router.put("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (re
 });
 
 // 5. Update invoice payment status
-router.patch("/:id/payment-status", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.patch("/:id/payment-status", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { paymentStatus, notes } = req.body;
@@ -847,7 +847,7 @@ router.get("/stats/overview", authenticateToken, async (req: Request, res: Respo
 });
 
 // 8. Delete invoice
-router.delete("/:id", authenticateToken, requireRole(["Admin", "Sales"]), async (req: Request, res: Response) => {
+router.delete("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 

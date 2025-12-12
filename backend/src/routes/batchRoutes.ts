@@ -104,7 +104,7 @@ async function deductMaterials(
 }
 
 // Create new batch
-router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.post("/", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const {
       productName,
@@ -349,7 +349,7 @@ router.get("/qr/:batchCode", async (req: Request, res: Response) => {
 });
 
 // Update batch status
-router.patch("/:batchId/status", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.patch("/:batchId/status", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { batchId } = req.params;
     const { status, endTime, productionNotes } = req.body;
@@ -394,7 +394,7 @@ router.patch("/:batchId/status", authenticateToken, requireRole(["Admin", "Super
 });
 
 // Upload photos for batch
-router.post("/:batchId/photos", authenticateToken, requireRole(["Admin", "Supervisor", "Worker"]), upload.array("photos", 10), async (req: Request, res: Response) => {
+router.post("/:batchId/photos", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor", "Worker"]), upload.array("photos", 10), async (req: Request, res: Response) => {
   try {
     const { batchId } = req.params;
     const { photoType, notes } = req.body; // photoType: "before", "after", "quality_check"
@@ -440,7 +440,7 @@ router.post("/:batchId/photos", authenticateToken, requireRole(["Admin", "Superv
 });
 
 // Add quality check record
-router.post("/:batchId/quality-checks", authenticateToken, requireRole(["Admin", "Supervisor", "Worker"]), async (req: Request, res: Response) => {
+router.post("/:batchId/quality-checks", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor", "Worker"]), async (req: Request, res: Response) => {
   try {
     const { batchId } = req.params;
     const { checkType, result, notes, inspectorId } = req.body;
@@ -622,7 +622,7 @@ router.get("/stats/overview", authenticateToken, async (req: Request, res: Respo
 });
 
 // Delete batch
-router.delete("/:batchId", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.delete("/:batchId", authenticateToken, requireRole(["Admin", "ProductionManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { batchId } = req.params;
 

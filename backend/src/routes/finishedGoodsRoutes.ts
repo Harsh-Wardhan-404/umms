@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // 1. Create finished goods entry (post-production)
-router.post("/", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.post("/", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const {
       batchId,
@@ -201,7 +201,7 @@ router.get("/:id", authenticateToken, async (req: Request, res: Response) => {
 });
 
 // 4. Update finished goods
-router.patch("/:id", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.patch("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const {
@@ -317,7 +317,7 @@ router.get("/batch/:batchId", authenticateToken, async (req: Request, res: Respo
 });
 
 // 7. Delete finished goods
-router.delete("/:id", authenticateToken, requireRole(["Admin", "Supervisor"]), async (req: Request, res: Response) => {
+router.delete("/:id", authenticateToken, requireRole(["Admin", "ProductionManager", "InventoryManager", "Supervisor"]), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
